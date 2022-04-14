@@ -27,7 +27,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Cluster Compute allows you to run fprograms accross computers",
+    description="Overkill lets you run parallel processes accross computers",
     entry_points={
         'console_scripts': [
             'overkill=overkill.cli:main',

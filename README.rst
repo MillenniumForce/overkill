@@ -1,5 +1,5 @@
 ===============
-Cluster Compute
+Overkill
 ===============
 
 
@@ -7,7 +7,7 @@ Cluster Compute
 
 
 
-Cluster Compute allows you to run fprograms accross computers
+Overkill lets you run parallel processes accross computers
 
 
 
