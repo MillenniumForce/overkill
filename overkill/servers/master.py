@@ -15,7 +15,6 @@ from overkill.utils.utils import (decode_message, encode_dict, flatten,
                                   send_message, synchronized)
 
 # locking https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
-_lock = threading.Lock()
 
 _resources = 0 # server resources (must be >0)
 _workers = [] # array of workerInfo
@@ -23,6 +22,8 @@ _work_orders = {} # dict of work_id: workOrder
 
 
 class _MasterServer(socketserver.BaseRequestHandler):
+
+    _lock = threading.Lock()
 
     def __init__(self, request, client_address, server) -> None:
         socketserver.BaseRequestHandler.__init__(
@@ -163,8 +164,7 @@ class Master:
         self._server = _ThreadedMasterServer(address, _MasterServer)
         logging.info(f"Master server running on {self.get_address()}")
 
-        t = threading.Thread(target=self._server.serve_forever)
-        t.setDaemon(True)  # don't hang on exit
+        t = threading.Thread(target=self._server.serve_forever, daemon=True)
         t.start()
 
     def stop(self) -> None:
@@ -172,6 +172,7 @@ class Master:
         if self._server is None:
             logging.error("No server has been started")
             return
+        self._server.socket.close()
         self._server.shutdown()
 
     def get_address(self) -> Tuple[str, int]:

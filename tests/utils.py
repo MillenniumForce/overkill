@@ -1,10 +1,11 @@
+from doctest import master
 import socket
 from typing import Dict, Tuple
-from overkill.utils.server_messaging_standards import NEW_CONNECTION
-from overkill.utils.utils import decode_message, encode_dict
+from overkill.utils.server_messaging_standards import ACCEPT_WORK, DELEGATE_WORK, FINISHED_TASK, NEW_CONNECTION
+from overkill.utils.utils import decode_message, encode_dict, send_message
 
 
-class mockWorker:
+class MockWorker:
     def __init__(self, host: str, port: int) -> None:
         """Mock the functionality of a worker
 
@@ -14,32 +15,36 @@ class mockWorker:
         :type port: int
         """
         self.address = (host, port)
+        self.recieved = None
+        self.master_address = None
 
-    def recieve_connection(self) -> Dict:
-        """Revieve a connection from master
+    def recieve_connection(self) -> None:
+        """Revieve a connection from master.
+        The recieved message is stored in the MockWorker.response variable
 
-        :raises Exception: _description_
-        :return: _description_
-        :rtype: Dict
+        :raises Exception: no data recieved from master
         """
-
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.address))
             s.listen()
             conn, addr = s.accept()
             with conn:
-                print(f"Connected by {addr}")
-                data = conn.recv(1024)
+                data = decode_message(conn.recv(1024))
+                print(data)
                 if not data:
                     raise Exception("No data recieved from master")
-                return decode_message(data)
+                if data["type"] == DELEGATE_WORK:
+                    msg = {"type": ACCEPT_WORK, "work_id": data["work_id"], "data": [1], "order": 0}
+                    send_message(encode_dict(msg), self.master_address)
+                self.recieved = data
 
     def connect_to_master(self, master_address: Tuple[str, int]) -> None:
-        """Connect to master
+        """Send connection request to master
 
         :param master_address: Tuple of (ip, port)
         :type master_address: Tuple[str, int]
         """
+        self.master_address = master_address
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             connection_message = {"type": NEW_CONNECTION, "name": "test", "address": self.address}
             sock.connect(master_address)

@@ -102,8 +102,7 @@ class Worker:
         address = ('localhost', 0)
         self._server = _ThreadedWorkerServer(address, _WorkerServer)
 
-        t = threading.Thread(target=self._server.serve_forever)
-        t.setDaemon(True)
+        t = threading.Thread(target=self._server.serve_forever, daemon=True)
         t.start()
 
     def stop(self) -> None:
@@ -112,6 +111,7 @@ class Worker:
             logging.warning("No server has been started")
         else:
             # TODO: notify master
+            self._server.socket.close()
             self._server.shutdown()
 
     def get_address(self) -> Tuple[str, int]:
