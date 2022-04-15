@@ -1,11 +1,11 @@
-import concurrent.futures
 import random
 import socket
 from threading import Thread
-import pytest
 
 from overkill.servers.master import Master
-from overkill.utils.server_messaging_standards import ACCEPT, DELEGATE_WORK, DISTRIBUTE, FINISHED_TASK
+from overkill.utils.server_messaging_standards import (ACCEPT, DELEGATE_WORK,
+                                                       DISTRIBUTE,
+                                                       FINISHED_TASK)
 from overkill.utils.utils import *
 from tests.utils import MockWorker
 
