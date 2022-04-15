@@ -18,8 +18,7 @@ import traceback
 # locking https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
 _lock = threading.Lock()
 
-
-_resources = 0  # probably just implement as globals?
+_resources = 0
 _workers = []
 _work_orders = {}
 
