@@ -1,34 +1,78 @@
+"""General unsorted utility functions"""
+
 import functools
 import socket
-import json
-from typing import Dict
+import threading
+from typing import Any, Dict, List, Tuple
 from overkill.utils.server_messaging_standards import ENCODING
 import dill
 
 
-def send_message(message, address):
+def send_message(message: str, address: Tuple[str, int]) -> None:
+    """Send a message to an arbitrary address.
+    Warning: does not handle any exceptions
+
+    :param message: message to be sent
+    :type message: str
+    :param address: tuple of ip, port
+    :type address: Tuple[str, int]
+    """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(address)
     s.sendall(message)
     s.close()
 
 
-def encode_dict(d: Dict):
+def encode_dict(d: Dict) -> bytes:
+    """Ecode the dictionary using dill.
+    Dill is used to ensure that functions are encoded correctly
+    Warning: does not handle any exceptions
+
+    :param d: dictionary to encode
+    :type d: Dict
+    :return: dictionary in bytes form
+    :rtype: bytes
+    """
     return dill.dumps(d)
 
 
-def decode_message(b: bytes):
+def decode_message(b: bytes) -> Any:
+    """Decode arbitrary bytes using Dill.
+    Most common usecase is to decode a message.
+    Dill is used to ensure functions are decoded correctly
+    Warning: does not handle any exceptions
+
+    :param b: bytes to decode
+    :type b: bytes
+    :return: decoded object (usually a dict)
+    :rtype: Any
+    """
     return dill.loads(b)
 
 
 # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
-def flatten(t):
-    return [item for sublist in t for item in sublist]
+def flatten(lst: List) -> List:
+    """Flatten an arbitrary 2D list
+
+    E.g. [[1], [2], [3]] = [1, 2, 3]
+
+    :param lst: list to flatten
+    :type lst: List
+    :return: flattened list
+    :rtype: List
+    """
+    return [item for sublist in lst for item in sublist]
 
 
 # https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
-def synchronized(lock):
-    """ Synchronization decorator """
+def synchronized(lock: threading.Lock) -> callable:
+    """Synchronization wrapper
+
+    :param lock: lock to acquire for synchronization
+    :type lock: threading.Lock
+    :return: wrapper
+    :rtype: callable
+    """
     def wrap(f):
         @functools.wraps(f)
         def newFunction(*args, **kw):

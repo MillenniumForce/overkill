@@ -1,21 +1,23 @@
-import random
-import pytest
-from overkill.servers.worker import Worker
-from overkill.servers.master import Master
 import concurrent.futures
-from tests.utils import mockWorker
+import random
 import socket
-from overkill.utils.utils import *
+
+from overkill.servers.master import Master
+from overkill.servers.worker import Worker
 from overkill.utils.server_messaging_standards import *
+from overkill.utils.utils import *
+from tests.utils import mockWorker
 
 
 def test_instantiation():
+    """Test the instantiation of a new worker"""
     w = Worker("test")
     w.start()
     w.stop()
 
 
 def test_recieve_work():
+    """Test recieving work from master"""
     m = Master()
     m.start()
 

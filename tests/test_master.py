@@ -1,21 +1,24 @@
-from pandas import array
-import pytest
-import socket
-from overkill.servers.master import Master
-from overkill.utils.server_messaging_standards import DISTRIBUTE, ACCEPT
-import json
-from overkill.utils.utils import *
 import concurrent.futures
-from tests.utils import mockWorker
 import random
+import socket
+
+import pytest
+
+from overkill.servers.master import Master
+from overkill.utils.server_messaging_standards import ACCEPT, DISTRIBUTE
+from overkill.utils.utils import *
+from tests.utils import mockWorker
+
 
 def test_instantiation():
+    """Test instantiation of Master"""
     m = Master()
     m.start()
     m.stop()
 
 
 def test_new_worker():
+    """Test adding a new worker to master"""
     m = Master()
     m.start()
 
@@ -35,8 +38,10 @@ def test_new_worker():
     executor.shutdown()
     m.stop()
 
+
 @pytest.mark.skip(reason="WIP")
 def test_delegate_task():
+    """WIP"""
     m = Master()
     m.start()
 
