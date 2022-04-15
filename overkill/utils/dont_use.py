@@ -8,6 +8,7 @@ def f(x):
 
 
 def test(address):
+    """DONT USE Helper function for testing"""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 
         connection_message = {"type": server_messaging_standards.DISTRIBUTE,

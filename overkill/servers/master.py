@@ -1,35 +1,40 @@
-from concurrent.futures import thread
+"""This module contains the main functionality of the master server"""
+
 import logging
+import socketserver
+import threading
+import traceback
 from math import ceil
 from random import random
-import resource
-import threading
-import socketserver
-import json
-from typing import Dict
+from typing import Dict, Tuple
 
-from overkill.utils.server_exceptions import askTypeNotFoundError
-from ..utils.server_data_classes import WorkOrder, workerInfo
-from ..utils.utils import decode_message, encode_dict, flatten, send_message, synchronized
-from ..utils.server_messaging_standards import *
-import socket
-import traceback
+from overkill.utils.server_data_classes import WorkOrder, workerInfo
+from overkill.utils.server_exceptions import AskTypeNotFoundError
+from overkill.utils.server_messaging_standards import *
+from overkill.utils.utils import (decode_message, encode_dict, flatten,
+                                  send_message, synchronized)
 
 # locking https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
-_lock = threading.Lock()
 
-_resources = 0
-_workers = []
-_work_orders = {}
+_resources = 0 # server resources (must be >0)
+_workers = [] # array of workerInfo
+_work_orders = {} # dict of work_id: workOrder
 
 
 class _MasterServer(socketserver.BaseRequestHandler):
+
+    _lock = threading.Lock()
 
     def __init__(self, request, client_address, server) -> None:
         socketserver.BaseRequestHandler.__init__(
             self, request, client_address, server)
 
     def handle(self):
+        """Handle incoming connections
+
+        :raises Exception: internal error in master server
+        :raises askTypeNotFoundError: occurs when there is no case for an ask type
+        """
         # TODO: what happens if there's more than 1024 bytes
         data = self.request.recv(1024)
         try:
@@ -48,8 +53,8 @@ class _MasterServer(socketserver.BaseRequestHandler):
             elif ask["type"] == ACCEPT_WORK:
                 self.recieve_completed_task(ask)
             else:
-                raise askTypeNotFoundError(f"No such type {ask['type']}")
-        except askTypeNotFoundError as e:
+                raise AskTypeNotFoundError(f"No such type {ask['type']}")
+        except AskTypeNotFoundError as e:
             logging.info(f"No such ask exists: {e}")
             return
         except Exception as e:
@@ -58,7 +63,14 @@ class _MasterServer(socketserver.BaseRequestHandler):
             return
 
     @synchronized(_lock)
-    def welcome_new_worker(self, worker_details):
+    def welcome_new_worker(self, worker_details: Dict) -> None:
+        """Process a new worker and either accept or reject
+        Accept: add to list of workers
+        Reject: send rejection message back to server
+
+        :param worker_details: dictionary of type, name, address
+        :type worker_details: Dict
+        """
         global _resources, _workers
         try:
             new_worker = workerInfo(
@@ -77,6 +89,14 @@ class _MasterServer(socketserver.BaseRequestHandler):
 
     @synchronized(_lock)
     def delegate_task(self, ask: Dict) -> int:
+        """Delegate tasks to each worker
+        All tasks are currently split evenly between workers
+
+        :param ask: dictionary of type, function, array
+        :type ask: Dict
+        :return: work id of the delegated task
+        :rtype: int
+        """
         global _work_orders
         func = ask["function"]
         array = ask["array"]
@@ -100,7 +120,12 @@ class _MasterServer(socketserver.BaseRequestHandler):
         return work_id
 
     @synchronized(_lock)
-    def recieve_completed_task(self, ask):
+    def recieve_completed_task(self, ask: Dict) -> None:
+        """Recieve a completed task from a worker
+
+        :param ask: dictionary of type, work_id, data (array), order (to insert into the correct position)
+        :type ask: Dict
+        """
         global _work_orders
         work_id = ask["work_id"]
         new_data = ask["data"]
@@ -118,6 +143,7 @@ class _ThreadedMasterServer(socketserver.ThreadingMixIn, socketserver.TCPServer)
 class Master:
 
     def __init__(self) -> None:
+        """Class acts as a high-level api to start and stop a master server"""
         logging.basicConfig(filename="master.log",
                             filemode="w",
                             format="%(levelname)s %(asctime)s - %(message)s",
@@ -131,21 +157,28 @@ class Master:
         _workers = []
         _work_orders = {}
 
-    def start(self):
+    def start(self) -> None:
+        """Start the server"""
         self.__init__()
         address = ('localhost', 0)  # let the kernel give us a port
         self._server = _ThreadedMasterServer(address, _MasterServer)
         logging.info(f"Master server running on {self.get_address()}")
 
-        t = threading.Thread(target=self._server.serve_forever)
-        t.setDaemon(True)  # don't hang on exit
+        t = threading.Thread(target=self._server.serve_forever, daemon=True)
         t.start()
 
-    def stop(self):
+    def stop(self) -> None:
+        """Stop the server"""
         if self._server is None:
             logging.error("No server has been started")
             return
+        self._server.socket.close()
         self._server.shutdown()
 
-    def get_address(self):
+    def get_address(self) -> Tuple[str, int]:
+        """Get the address of the master server
+
+        :return: tuple of ip, port
+        :rtype: Tuple[str, int]
+        """
         return self._server.server_address  # find out what port we were given

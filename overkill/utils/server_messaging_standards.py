@@ -1,3 +1,9 @@
+"""
+This module contains variables that outline
+certains standards of how servers should 
+interact with each other
+"""
+
 # Universal encoding
 ENCODING = "utf-8"
 
