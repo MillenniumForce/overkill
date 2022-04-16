@@ -57,7 +57,6 @@ class _WorkerServer(socketserver.BaseRequestHandler):
 
     def do_work(self, ask: Dict) -> List:
         """After recieving work from the master server, execute the function on the data
-        Current implementation uses 2 cores in parallel
 
         :param ask: dict of type, function, array
         :type ask: Dict
@@ -67,8 +66,7 @@ class _WorkerServer(socketserver.BaseRequestHandler):
         func = ask["function"]
         data = ask["array"]
 
-        with multiprocessing.Pool(2) as p:
-            results = p.map(func, data)
+        results = list(map(func, data))
 
         return results
 
