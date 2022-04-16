@@ -83,7 +83,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
             )
             send_message(encode_dict({"type": ACCEPT, "id": new_worker.id,
                                       "master_address": self.server.server_address}), new_worker.address)
-            _workers[new_worker.id] = (new_worker)
+            _workers[new_worker.id] = new_worker
             _resources += 1
             logging.info("Resources at welcome new worker: %d", _resources)
         except Exception as e:
@@ -111,7 +111,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
         work_id = hash(random())
         event = threading.Event()
 
-        for worker, (i, data) in zip(_workers.items(), enumerate(array_split)):
+        for worker, (i, data) in zip(_workers.values(), enumerate(array_split)):
             # assume worker will always accept work
             work_request = {"type": DELEGATE_WORK, "work_id": work_id,
                             "function": func, "array": data, "order": i}
