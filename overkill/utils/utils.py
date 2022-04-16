@@ -8,12 +8,12 @@ from overkill.utils.server_messaging_standards import ENCODING
 import dill
 
 
-def send_message(message: str, address: Tuple[str, int]) -> None:
+def send_message(message: bytes, address: Tuple[str, int]) -> None:
     """Send a message to an arbitrary address.
     Warning: does not handle any exceptions
 
-    :param message: message to be sent
-    :type message: str
+    :param message: bytes to be sent
+    :type message: bytes
     :param address: tuple of ip, port
     :type address: Tuple[str, int]
     """

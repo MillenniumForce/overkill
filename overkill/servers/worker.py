@@ -22,6 +22,9 @@ class _WorkerServer(socketserver.BaseRequestHandler):
         socketserver.BaseRequestHandler.__init__(
             self, request, client_address, server)
 
+    def server_close(self):
+        pass
+
     def handle(self):
         """Handle incoming connections
 
@@ -115,9 +118,11 @@ class Worker:
         if self._server is None:
             logging.warning("No server has been started")
         else:
-            # TODO: notify master
+            msg = encode_dict({"type": CLOSE_CONNECTION, "id": _id})
+            send_message(msg, _master.address)
             self._server.socket.close()
             self._server.shutdown()
+            logging.info("Worker shutdown")
 
     def get_address(self) -> Tuple[str, int]:
         """Get the address of the worker server

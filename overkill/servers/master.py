@@ -17,7 +17,7 @@ from overkill.utils.utils import (decode_message, encode_dict, flatten,
 # locking https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
 
 _resources = 0 # server resources (must be >0)
-_workers = [] # array of workerInfo
+_workers = {} # dict of worker_id: workerInfo
 _work_orders = {} # dict of work_id: workOrder
 
 
@@ -52,6 +52,9 @@ class _MasterServer(socketserver.BaseRequestHandler):
                     {"type": FINISHED_TASK, "data": data}))
             elif ask["type"] == ACCEPT_WORK:
                 self.recieve_completed_task(ask)
+            elif ask["type"] == CLOSE_CONNECTION:
+                resources = self.remove_worker(ask)
+                logging.info(f"Worker shutdown, resources left: {resources}")
             else:
                 raise AskTypeNotFoundError(f"No such type {ask['type']}")
         except AskTypeNotFoundError as e:
@@ -80,7 +83,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
             )
             send_message(encode_dict({"type": ACCEPT, "id": new_worker.id,
                                       "master_address": self.server.server_address}), new_worker.address)
-            _workers.append(new_worker)
+            _workers[new_worker.id] = (new_worker)
             _resources += 1
             logging.info("Resources at welcome new worker: %d", _resources)
         except Exception as e:
@@ -108,7 +111,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
         work_id = hash(random())
         event = threading.Event()
 
-        for worker, (i, data) in zip(_workers, enumerate(array_split)):
+        for worker, (i, data) in zip(_workers.items(), enumerate(array_split)):
             # assume worker will always accept work
             work_request = {"type": DELEGATE_WORK, "work_id": work_id,
                             "function": func, "array": data, "order": i}
@@ -135,6 +138,20 @@ class _MasterServer(socketserver.BaseRequestHandler):
         if _work_orders[work_id].progress == 1:
             _work_orders[work_id].event.set()
 
+    @synchronized(_lock)
+    def remove_worker(self, ask: Dict) -> int:
+        """Remove worker by decrementing resource count and removing from the worker db
+
+        :param ask: dictionary of type, worker_id
+        :type ask: Dict
+        :return: number of compute resources left
+        :rtype: int
+        """
+        global _resources, _workers
+        _resources -= 1
+        _workers.pop(ask["id"])
+
+        return _resources
 
 class _ThreadedMasterServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
@@ -154,7 +171,7 @@ class Master:
 
         global _resources, _workers, _work_orders
         _resources = 0
-        _workers = []
+        _workers = {}
         _work_orders = {}
 
     def start(self, ip: str = "localhost", port: int = 0) -> None:
