@@ -119,7 +119,8 @@ class Worker:
             logging.warning("No server has been started")
         else:
             msg = encode_dict({"type": CLOSE_CONNECTION, "id": _id})
-            send_message(msg, _master.address)
+            if _master:
+                send_message(msg, _master.address)
             self._server.socket.close()
             self._server.shutdown()
             logging.info("Worker shutdown")
