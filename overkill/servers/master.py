@@ -78,11 +78,11 @@ class _MasterServer(socketserver.BaseRequestHandler):
                 worker_details["name"],
                 worker_details["address"]
             )
+            send_message(encode_dict({"type": ACCEPT, "id": new_worker.id,
+                                      "master_address": self.server.server_address}), new_worker.address)
             _workers.append(new_worker)
             _resources += 1
             logging.info("Resources at welcome new worker: %d", _resources)
-            send_message(encode_dict({"type": ACCEPT, "id": new_worker.id,
-                                      "master_address": self.server.server_address}), new_worker.address)
         except Exception as e:
             self.request.sendall(encode_dict({"type": REJECT}))
             logging.info(f"Could not instantiate new worker: {e}")
@@ -157,10 +157,16 @@ class Master:
         _workers = []
         _work_orders = {}
 
-    def start(self) -> None:
-        """Start the server"""
+    def start(self, ip: str = "localhost", port: int = 0) -> None:
+        """Start the server on the given ip and port
+
+        :param ip: server ip address to bind to, defaults to "localhost"
+        :type ip: str, optional
+        :param port: server port to bind to, defaults to 0
+        :type port: int, optional
+        """
         self.__init__()
-        address = ('localhost', 0)  # let the kernel give us a port
+        address = (ip, port)
         self._server = _ThreadedMasterServer(address, _MasterServer)
         logging.info(f"Master server running on {self.get_address()}")
 
