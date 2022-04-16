@@ -1,6 +1,6 @@
-* Cluster Compute version:
-* Python version:
-* Operating System:
+-   Overkill version:
+-   Python version:
+-   Operating System:
 
 ### Description
 

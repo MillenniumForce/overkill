@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Cluster Compute'
+project = "Overkill"
 copyright = "2022, Julian Garratt"
 author = "Julian Garratt"
 
@@ -128,7 +128,7 @@ latex_elements = {
 # [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'overkill.tex',
-     'Cluster Compute Documentation',
+     'Overkill Documentation',
      'Julian Garratt', 'manual'),
 ]
 
@@ -139,7 +139,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'overkill',
-     'Cluster Compute Documentation',
+     'Overkill Documentation',
      [author], 1)
 ]
 
@@ -151,7 +151,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'overkill',
-     'Cluster Compute Documentation',
+     'Overkill Documentation',
      author,
      'overkill',
      'One line description of project.',

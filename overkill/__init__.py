@@ -1,4 +1,4 @@
-"""Top-level package for Cluster Compute."""
+"""Top-level package for Overkill."""
 
 __author__ = """Julian Garratt"""
 __email__ = 'jgarratt01@icloud.com'

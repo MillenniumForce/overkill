@@ -1,4 +1,4 @@
-Welcome to Cluster Compute's documentation!
+Welcome to Overkill's documentation!
 ======================================
 
 .. toctree::

@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install Cluster Compute, run this command in your terminal:
+To install Overkill, run this command in your terminal:
 
 .. code-block:: console
 
     $ pip install overkill
 
-This is the preferred method to install Cluster Compute, as it will always install the most recent stable release.
+This is the preferred method to install Overkill, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for Cluster Compute can be downloaded from the `Github repo`_.
+The sources for Overkill can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
