@@ -96,14 +96,21 @@ class Worker:
         _master = None
         _id = None
 
-    def start(self) -> None:
-        """Start the server"""
+    def start(self, ip: str = "localhost", port: int = 0) -> None:
+        """Start the server on the given ip and port
+
+        :param ip: server ip address to bind to, defaults to "localhost"
+        :type ip: str, optional
+        :param port: server port to bind to, defaults to 0
+        :type port: int, optional
+        """
         self.__init__(self.name)
-        address = ('localhost', 0)
+        address = (ip, port)
         self._server = _ThreadedWorkerServer(address, _WorkerServer)
 
         t = threading.Thread(target=self._server.serve_forever, daemon=True)
         t.start()
+        logging.info(f"Worker server running on {self.get_address()}")
 
     def stop(self) -> None:
         """Stop the server"""
