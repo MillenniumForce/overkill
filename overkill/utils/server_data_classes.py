@@ -2,7 +2,9 @@
 
 from dataclasses import dataclass, field
 from threading import Event
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Union
+
+from overkill.utils.server_exceptions import WorkError
 
 
 @dataclass
@@ -11,7 +13,7 @@ class _WorkerInfo:
     id: str
     name: str
     address: Tuple
-    active: bool = True
+    can_accept_work: bool = True
 
 
 @dataclass
@@ -27,6 +29,7 @@ class _WorkOrder:
     event: Event
     data: List = field(default_factory=lambda: [])
     progress: float = 0
+    error: Union[None, WorkError] = None
 
     def update(self, new_data: List, order: int) -> float:
         """Update the work order given new data

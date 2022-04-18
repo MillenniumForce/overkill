@@ -6,6 +6,7 @@ import socket
 from typing import Callable, Dict, List, Tuple, Union
 
 from overkill.utils import server_messaging_standards, utils
+from overkill.utils.server_exceptions import WorkError
 
 
 class ClusterCompute:
@@ -58,3 +59,5 @@ class ClusterCompute:
         return_type = result.get("type")
         if return_type == server_messaging_standards._FINISHED_TASK:
             return result.get("data")
+        if return_type == server_messaging_standards._WORK_ERROR:
+            raise WorkError(result.get("error"))

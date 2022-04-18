@@ -17,3 +17,4 @@ _FINISHED_TASK = "finished_task"  # task from user has been completely finished
 # Worker messsaging standards:
 _CLOSE_CONNECTION = "close"  # close connection with master
 _ACCEPT_WORK = "accept_work"  # accept work from a worker
+_WORK_ERROR = "work_error" # error when computing the function on the array

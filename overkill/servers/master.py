@@ -13,7 +13,7 @@ from overkill.utils.server_exceptions import AskTypeNotFoundError
 from overkill.utils.server_messaging_standards import (_DISTRIBUTE, _NEW_CONNECTION,
                                                        _REJECT, _ACCEPT, _ACCEPT_WORK,
                                                        _CLOSE_CONNECTION, _DELEGATE_WORK,
-                                                       _FINISHED_TASK)
+                                                       _FINISHED_TASK, _WORK_ERROR)
 from overkill.utils.utils import (_decode_message, _encode_dict, _flatten,
                                   _send_message, _synchronized)
 
@@ -47,6 +47,9 @@ class _MasterServer(socketserver.BaseRequestHandler):
             elif ask["type"] == _DISTRIBUTE:
                 work_id = self.delegate_task(ask)
                 _work_orders[work_id].event.wait()
+                if _work_orders[work_id].error:
+                    err = {"type": _WORK_ERROR, "error": _work_orders[work_id].error}
+                    self.request.sendall(_encode_dict(err))
                 data = _flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
                 logging.info(f"Completed task {work_order}")
@@ -57,6 +60,8 @@ class _MasterServer(socketserver.BaseRequestHandler):
             elif ask["type"] == _CLOSE_CONNECTION:
                 resources = self.remove_worker(ask)
                 logging.info(f"Worker shutdown, resources left: {resources}")
+            elif ask["type"] == _WORK_ERROR:
+                self.handle_work_error(ask)
             else:
                 raise AskTypeNotFoundError(f"No such type {ask['type']}")
         except AskTypeNotFoundError as e:
@@ -154,6 +159,18 @@ class _MasterServer(socketserver.BaseRequestHandler):
         _workers.pop(ask["id"])
 
         return _resources
+    
+    @_synchronized(_lock)
+    def handle_work_error(self, ask: Dict) -> None:
+        """Handle work error by setting the error message of the work order
+        and by setting the work_id thread to true
+
+        :param ask: _description_
+        :type ask: Dict
+        """
+        global _work_orders
+        _work_orders[ask["work_id"]].error = ask["error"]
+        _work_orders[ask["work_id"]].event.set()
 
 
 class _ThreadedMasterServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

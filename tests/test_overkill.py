@@ -10,8 +10,12 @@ from click.testing import CliRunner
 
 from overkill import overkill
 from overkill import cli
+from overkill.servers.master import Master
+from overkill.servers.worker import Worker
 from overkill.utils import server_messaging_standards
-from tests.utils import MockMaster
+from overkill.utils.server_exceptions import WorkError
+from overkill.utils.utils import _encode_dict
+from tests.utils import MockMaster, MockWorker
 
 
 @pytest.fixture
@@ -56,3 +60,20 @@ def test_map():
     t.join()
 
     assert m.recieved["type"] == server_messaging_standards._DISTRIBUTE
+
+def test_work_error():
+    m = Master()
+    m.start()
+
+    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+    PORT = random.randint(1024, 65534)
+
+    w = Worker("test")
+    w.start()
+    w.connect_to_master(*m.get_address())
+
+    cc = overkill.ClusterCompute(1, m.get_address())
+    with pytest.raises(WorkError):
+        cc.map("foo", [1, 2, 3])
+
+    m.stop()
