@@ -3,10 +3,10 @@ import socket
 from threading import Thread
 
 from overkill.servers.master import Master
-from overkill.utils.server_messaging_standards import (ACCEPT, DELEGATE_WORK,
-                                                       DISTRIBUTE,
-                                                       FINISHED_TASK)
-from overkill.utils.utils import *
+from overkill.utils.server_messaging_standards import (_ACCEPT, _DELEGATE_WORK,
+                                                       _DISTRIBUTE,
+                                                       _FINISHED_TASK)
+from overkill.utils.utils import _encode_dict, _decode_message
 from tests.utils import MockWorker
 
 
@@ -31,8 +31,8 @@ def test_new_worker():
     w.connect_to_master(m.get_address())
     t.join()
 
-    assert(w.recieved["type"] == ACCEPT)
-   
+    assert(w.recieved["type"] == _ACCEPT)
+
     m.stop()
 
 
@@ -51,19 +51,19 @@ def test_recieve_work():
     t.start()
     w.connect_to_master(m.get_address())
     t.join()
-    assert w.recieved["type"] == ACCEPT
+    assert w.recieved["type"] == _ACCEPT
 
     # 2: recieve work from master
     t = Thread(target=w.recieve_connection, daemon=True)
     t.start()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(m.get_address())
-        sock.sendall(encode_dict(
-            {"type": DISTRIBUTE, "function": f, "array": [1, 2, 3]}))
-        msg = decode_message(sock.recv(1024))
-        assert msg["type"] == FINISHED_TASK
+        sock.sendall(_encode_dict(
+            {"type": _DISTRIBUTE, "function": f, "array": [1, 2, 3]}))
+        msg = _decode_message(sock.recv(1024))
+        assert msg["type"] == _FINISHED_TASK
     t.join()
-    assert w.recieved["type"] == DELEGATE_WORK
+    assert w.recieved["type"] == _DELEGATE_WORK
 
     m.stop()
 

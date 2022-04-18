@@ -35,13 +35,13 @@ class ClusterCompute:
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             connection_message = {
-                "type": server_messaging_standards.DISTRIBUTE,
+                "type": server_messaging_standards._DISTRIBUTE,
                 "function": function,
                 "array": array
             }
             sock.connect(self.master_address)
-            sock.sendall(utils.encode_dict(connection_message))
-            result = utils.decode_message(sock.recv(10000))
+            sock.sendall(utils._encode_dict(connection_message))
+            result = utils._decode_message(sock.recv(10000))
         return self.__handle_result(result)
 
     def __handle_result(self, result: Dict) -> List:
@@ -56,5 +56,5 @@ class ClusterCompute:
         :rtype: List
         """
         return_type = result.get("type")
-        if return_type == server_messaging_standards.FINISHED_TASK:
+        if return_type == server_messaging_standards._FINISHED_TASK:
             return result.get("data")

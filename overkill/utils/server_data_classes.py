@@ -6,7 +6,7 @@ from typing import Any, List, Tuple
 
 
 @dataclass
-class workerInfo:
+class _WorkerInfo:
     """Worker inforamtion class"""
     id: str
     name: str
@@ -15,13 +15,13 @@ class workerInfo:
 
 
 @dataclass
-class masterInfo:
+class _MasterInfo:
     """Master information class"""
     address: Tuple
 
 
 @dataclass
-class WorkOrder:
+class _WorkOrder:
     """Class documents information about a work order from a client"""
     num_workers: int
     event: Event
