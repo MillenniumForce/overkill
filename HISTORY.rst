@@ -35,3 +35,9 @@ History
 ------------------
 
 * Added error handling for when the user incorrectly specifies the function or array (see issue #5)
+
+0.3.3 (2022-04-18)
+------------------
+
+* Refactored socket send and recieve protocols to handle large data
+Notes: could be optimised further but experimentation is required
