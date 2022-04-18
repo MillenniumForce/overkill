@@ -4,6 +4,7 @@
 
 import random
 from threading import Thread
+import time
 import pytest
 
 from click.testing import CliRunner
@@ -73,6 +74,10 @@ def test_work_error():
     w = Worker("test")
     w.start()
     w.connect_to_master(*m.get_address())
+
+    # ensure master finishes processing worker before
+    # accepting user's request
+    time.sleep(0.5)
 
     cc = overkill.ClusterCompute(1, m.get_address())
     with pytest.raises(WorkError):
