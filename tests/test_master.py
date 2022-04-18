@@ -6,7 +6,7 @@ from overkill.servers.master import Master
 from overkill.utils.server_messaging_standards import (_ACCEPT, _DELEGATE_WORK,
                                                        _DISTRIBUTE,
                                                        _FINISHED_TASK)
-from overkill.utils.utils import _encode_dict, _decode_message
+from overkill.utils.utils import _encode_dict, _decode_message, _recv_msg, _socket_send_message
 from tests.utils import MockWorker
 
 
@@ -37,7 +37,9 @@ def test_new_worker():
 
 
 def test_recieve_work():
-    """Test recieving and sending work from master"""
+    """Test sending work to master and recieving completed work
+    input array should be fairly large to test
+    """
     m = Master()
     m.start()
 
@@ -58,9 +60,9 @@ def test_recieve_work():
     t.start()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(m.get_address())
-        sock.sendall(_encode_dict(
-            {"type": _DISTRIBUTE, "function": f, "array": [1, 2, 3]}))
-        msg = _decode_message(sock.recv(1024))
+        _socket_send_message(_encode_dict(
+            {"type": _DISTRIBUTE, "function": f, "array": list(range(0, 10000))}), sock)
+        msg = _decode_message(_recv_msg(sock))
         assert msg["type"] == _FINISHED_TASK
     t.join()
     assert w.recieved["type"] == _DELEGATE_WORK
