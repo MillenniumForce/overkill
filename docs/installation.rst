@@ -5,8 +5,8 @@ Installation
 ============
 
 
-Stable release
---------------
+Stable release (not available, don't use)
+-----------------------------------------
 
 To install Overkill, run this command in your terminal:
 
