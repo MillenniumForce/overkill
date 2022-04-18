@@ -8,3 +8,12 @@ class AskTypeNotFoundError(TypeError):
 
 class ServerNotStartedError(Exception):
     """Raise this error when an execption needs to be raised when a server hasn't been started"""
+
+class WorkError(Exception):
+    """Raise this error when the worker encounters an error when trying to
+    execute the user's aray on the function"""
+
+
+class NoWorkersError(Exception):
+    """Raise this error when there are no workers connected to Master and
+    the user tries to ask for work"""

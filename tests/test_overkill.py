@@ -4,14 +4,19 @@
 
 import random
 from threading import Thread
+import time
 import pytest
 
 from click.testing import CliRunner
 
 from overkill import overkill
 from overkill import cli
+from overkill.servers.master import Master
+from overkill.servers.worker import Worker
 from overkill.utils import server_messaging_standards
-from tests.utils import MockMaster
+from overkill.utils.server_exceptions import NoWorkersError, WorkError
+from overkill.utils.utils import _encode_dict
+from tests.utils import MockMaster, MockWorker
 
 
 @pytest.fixture
@@ -44,6 +49,7 @@ def test_command_line_interface():
 
 
 def test_map():
+    """Test map function of CC class"""
     HOST = "127.0.0.1"
     PORT = random.randint(1024, 65534)
 
@@ -55,4 +61,38 @@ def test_map():
     cc.map("foo", "bar")
     t.join()
 
-    assert m.recieved["type"] == server_messaging_standards.DISTRIBUTE
+    assert m.recieved["type"] == server_messaging_standards._DISTRIBUTE
+
+def test_work_error():
+    """Test should raise a WorkError since the user has mispspecified the function for map"""
+    m = Master()
+    m.start()
+
+    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+    PORT = random.randint(1024, 65534)
+
+    w = Worker("test")
+    w.start()
+    w.connect_to_master(*m.get_address())
+
+    # ensure master finishes processing worker before
+    # accepting user's request
+    time.sleep(0.5)
+
+    cc = overkill.ClusterCompute(1, m.get_address())
+    with pytest.raises(WorkError):
+        cc.map("foo", [1, 2, 3])
+
+    m.stop()
+
+
+def test_no_workers_error():
+    """Test should raise a NoWorkersError since user requested work before any workers were created"""
+    m = Master()
+    m.start()
+
+    cc = overkill.ClusterCompute(1, m.get_address())
+    with pytest.raises(NoWorkersError):
+        cc.map("foo", "bar")
+
+    m.stop()
