@@ -19,3 +19,9 @@ History
 
 * Fixed regression in Master where dictionary items were used instead of values
 * Fixed regression in Worker where _master may be None
+
+0.3.0 (2022-04-18)
+------------------
+
+* Added initial user api (i.e. ClusterCompute class and map functionality)
+
