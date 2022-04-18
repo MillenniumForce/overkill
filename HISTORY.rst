@@ -25,3 +25,13 @@ History
 
 * Added initial user api (i.e. ClusterCompute class and map functionality)
 
+
+0.3.1 (2022-04-18)
+------------------
+
+* Refactored utils into protected members (see issue #17)
+
+0.3.2 (2022-04-18)
+------------------
+
+* Added error handling for when the user incorrectly specifies the function or array (see issue #5)
