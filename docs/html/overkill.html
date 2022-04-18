@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>overkill package &#8212; Overkill 0.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="overkill.servers package" href="overkill.servers.html" />
+    <link rel="prev" title="overkill" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="overkill-package">
+<h1>overkill package<a class="headerlink" href="#overkill-package" title="Permalink to this headline">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overkill.servers.html">overkill.servers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overkill.servers.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.servers.html#module-overkill.servers.master">overkill.servers.master module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.servers.html#module-overkill.servers.worker">overkill.servers.worker module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.servers.html#module-overkill.servers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overkill.utils.html">overkill.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils.dont_use">overkill.utils.dont_use module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils.server_data_classes">overkill.utils.server_data_classes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils.server_exceptions">overkill.utils.server_exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils.server_messaging_classes">overkill.utils.server_messaging_classes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils.server_messaging_standards">overkill.utils.server_messaging_standards module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils.utils">overkill.utils.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overkill.utils.html#module-overkill.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-overkill.cli">
+<span id="overkill-cli-module"></span><h2>overkill.cli module<a class="headerlink" href="#module-overkill.cli" title="Permalink to this headline">¶</a></h2>
+<p>Console script for overkill.</p>
+</section>
+<section id="module-overkill.overkill">
+<span id="overkill-overkill-module"></span><h2>overkill.overkill module<a class="headerlink" href="#module-overkill.overkill" title="Permalink to this headline">¶</a></h2>
+<p>Main module. All user interactions to distribute tasks should use this module.
+See the <a class="reference internal" href="#overkill.overkill.ClusterCompute" title="overkill.overkill.ClusterCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClusterCompute</span></code></a> for more details on distributing tasks.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="overkill.overkill.ClusterCompute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">overkill.overkill.</span></span><span class="sig-name descname"><span class="pre">ClusterCompute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/overkill/overkill.html#ClusterCompute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.overkill.ClusterCompute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The ClusterCompute class acts as the main interface between the Master server and the user.
+use this class to distribute an array over a cluster of computers given a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_workers</strong> (<em>int</em>) – number of workers to use to distribute (array is distributed evenly accross workers)</p></li>
+<li><p><strong>master_address</strong> (<em>Tuple</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) – A tuple of (ip, port) e.g. (“localhost”, 5555).
+Use the .get_address() class member of the Master class to get the address</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="overkill.overkill.ClusterCompute.map">
+<span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/overkill/overkill.html#ClusterCompute.map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.overkill.ClusterCompute.map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distribute array over function using all compute resources</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> (<em>Callable</em>) – Any array with a single argument</p></li>
+<li><p><strong>array</strong> (<em>List</em>) – array to distribute e.g. if Array type is List[int] then function should accept an int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed list if no exception has been raised</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Union[None, List]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-overkill">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-overkill" title="Permalink to this headline">¶</a></h2>
+<p>Top-level package for Overkill.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Overkill</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Overkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">overkill</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">overkill package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">overkill</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">overkill</a></li>
+      <li>Next: <a href="overkill.servers.html" title="next chapter">overkill.servers package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Julian Garratt.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/overkill.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

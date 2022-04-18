@@ -1,0 +1,38 @@
+overkill package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   overkill.servers
+   overkill.utils
+
+Submodules
+----------
+
+overkill.cli module
+-------------------
+
+.. automodule:: overkill.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+overkill.overkill module
+------------------------
+
+.. automodule:: overkill.overkill
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: overkill
+   :members:
+   :undoc-members:
+   :show-inheritance:
