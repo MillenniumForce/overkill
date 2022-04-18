@@ -1,5 +1,7 @@
 """This module acts as the main class to create and manage a worker server"""
 
+from base64 import encode
+from inspect import trace
 import logging
 import multiprocessing
 import socketserver
@@ -8,10 +10,10 @@ import traceback
 from typing import Dict, List, Tuple
 
 from overkill.utils.server_data_classes import _MasterInfo
-from overkill.utils.server_exceptions import AskTypeNotFoundError, ServerNotStartedError
+from overkill.utils.server_exceptions import AskTypeNotFoundError, ServerNotStartedError, WorkError
 from overkill.utils.server_messaging_standards import (_NEW_CONNECTION, _REJECT, _ACCEPT,
                                                        _ACCEPT_WORK, _CLOSE_CONNECTION,
-                                                       _DELEGATE_WORK)
+                                                       _DELEGATE_WORK, _WORK_ERROR)
 from overkill.utils.utils import _send_message, _encode_dict, _decode_message
 
 _master = None  # master info
@@ -55,6 +57,10 @@ class _WorkerServer(socketserver.BaseRequestHandler):
         except AskTypeNotFoundError as e:
             logging.info(f"No such ask exists: {e}")
             return
+        except WorkError as e:
+            logging.info(f"Encountered work error: {e}")
+            err = {"type": _WORK_ERROR, "work_id": ask["work_id"], "error": e}
+            _send_message(_encode_dict(err), _master.address)
         except Exception as e:
             logging.info(f"Could not handle request: {e}")
             logging.info(traceback.format_exc())
@@ -71,7 +77,10 @@ class _WorkerServer(socketserver.BaseRequestHandler):
         func = ask["function"]
         data = ask["array"]
 
-        results = list(map(func, data))
+        try:
+            results = list(map(func, data))
+        except Exception as e:
+            raise WorkError(f"Could not compute: {e} \n {traceback.format_exc()}")
 
         return results
 
