@@ -10,7 +10,7 @@ from typing import Dict, Tuple
 
 from overkill.utils.server_data_classes import _WorkOrder, _WorkerInfo
 from overkill.utils.server_exceptions import AskTypeNotFoundError
-from overkill.utils.server_messaging_standards import (_DISTRIBUTE, _NEW_CONNECTION,
+from overkill.utils.server_messaging_standards import (_DISTRIBUTE, _NEW_CONNECTION, _NO_WORKERS_ERROR,
                                                        _REJECT, _ACCEPT, _ACCEPT_WORK,
                                                        _CLOSE_CONNECTION, _DELEGATE_WORK,
                                                        _FINISHED_TASK, _WORK_ERROR)
@@ -44,12 +44,17 @@ class _MasterServer(socketserver.BaseRequestHandler):
             if ask["type"] == _NEW_CONNECTION:
                 self.welcome_new_worker(ask)
             elif ask["type"] == _DISTRIBUTE:
+                if len(_workers) == 0:
+                    err = {"type": _NO_WORKERS_ERROR}
+                    _socket_send_message(_encode_dict(err), self.request)
+                    return
                 work_id = self.delegate_task(ask)
                 _work_orders[work_id].event.wait()
                 if _work_orders[work_id].error:
                     err = {"type": _WORK_ERROR,
                            "error": _work_orders[work_id].error}
                     _socket_send_message(_encode_dict(err), self.request)
+                    return
                 data = _flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
                 logging.info(f"Completed task {work_order}")
