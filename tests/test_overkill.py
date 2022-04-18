@@ -2,12 +2,16 @@
 
 """Tests for `overkill` package."""
 
+import random
+from threading import Thread
 import pytest
 
 from click.testing import CliRunner
 
 from overkill import overkill
 from overkill import cli
+from overkill.utils import server_messaging_standards
+from tests.utils import MockMaster
 
 
 @pytest.fixture
@@ -37,3 +41,18 @@ def test_command_line_interface():
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output
+
+
+def test_map():
+    HOST = "127.0.0.1"
+    PORT = random.randint(1024, 65534)
+
+    m = MockMaster(HOST, PORT)
+    cc = overkill.ClusterCompute(1, (HOST, PORT))
+
+    t = Thread(target=m.recieve_connection, daemon=True)
+    t.start()
+    cc.map("foo", "bar")
+    t.join()
+
+    assert m.recieved["type"] == server_messaging_standards.DISTRIBUTE
