@@ -51,7 +51,7 @@ def test_recieve_work():
     t.start()
     w.connect_to_master(m.get_address())
     t.join()
-    assert(w.recieved["type"] == ACCEPT)
+    assert w.recieved["type"] == ACCEPT
 
     # 2: recieve work from master
     t = Thread(target=w.recieve_connection, daemon=True)
@@ -59,11 +59,14 @@ def test_recieve_work():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(m.get_address())
         sock.sendall(encode_dict(
-            {"type": DISTRIBUTE, "function": "foo", "array": [1, 2, 3]}))
+            {"type": DISTRIBUTE, "function": f, "array": [1, 2, 3]}))
         msg = decode_message(sock.recv(1024))
-        assert(msg["type"] == FINISHED_TASK)
+        assert msg["type"] == FINISHED_TASK
     t.join()
-    assert(w.recieved["type"] == DELEGATE_WORK)
+    assert w.recieved["type"] == DELEGATE_WORK
 
     m.stop()
 
+
+def f(x: int):
+    return x*2
