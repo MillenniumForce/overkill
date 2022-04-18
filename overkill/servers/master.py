@@ -8,17 +8,19 @@ from math import ceil
 from random import random
 from typing import Dict, Tuple
 
-from overkill.utils.server_data_classes import WorkOrder, workerInfo
+from overkill.utils.server_data_classes import _WorkOrder, _WorkerInfo
 from overkill.utils.server_exceptions import AskTypeNotFoundError
-from overkill.utils.server_messaging_standards import *
-from overkill.utils.utils import (decode_message, encode_dict, flatten,
-                                  send_message, synchronized)
+from overkill.utils.server_messaging_standards import (_DISTRIBUTE, _NEW_CONNECTION,
+                                                       _REJECT, _ACCEPT, _ACCEPT_WORK,
+                                                       _CLOSE_CONNECTION, _DELEGATE_WORK,
+                                                       _FINISHED_TASK)
+from overkill.utils.utils import (_decode_message, _encode_dict, _flatten,
+                                  _send_message, _synchronized)
 
-# locking https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
 
-_resources = 0 # server resources (must be >0)
-_workers = {} # dict of worker_id: workerInfo
-_work_orders = {} # dict of work_id: workOrder
+_resources = 0  # server resources (must be >0)
+_workers = {}  # dict of worker_id: _WorkerInfo
+_work_orders = {}  # dict of work_id: workOrder
 
 
 class _MasterServer(socketserver.BaseRequestHandler):
@@ -38,21 +40,21 @@ class _MasterServer(socketserver.BaseRequestHandler):
         # TODO: what happens if there's more than 1024 bytes
         data = self.request.recv(1024)
         try:
-            ask = decode_message(data)
+            ask = _decode_message(data)
             logging.info(ask)
-            if ask["type"] == NEW_CONNECTION:
+            if ask["type"] == _NEW_CONNECTION:
                 self.welcome_new_worker(ask)
-            elif ask["type"] == DISTRIBUTE:
+            elif ask["type"] == _DISTRIBUTE:
                 work_id = self.delegate_task(ask)
                 _work_orders[work_id].event.wait()
-                data = flatten(_work_orders[work_id].data)
+                data = _flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
                 logging.info(f"Completed task {work_order}")
-                self.request.sendall(encode_dict(
-                    {"type": FINISHED_TASK, "data": data}))
-            elif ask["type"] == ACCEPT_WORK:
+                self.request.sendall(_encode_dict(
+                    {"type": _FINISHED_TASK, "data": data}))
+            elif ask["type"] == _ACCEPT_WORK:
                 self.recieve_completed_task(ask)
-            elif ask["type"] == CLOSE_CONNECTION:
+            elif ask["type"] == _CLOSE_CONNECTION:
                 resources = self.remove_worker(ask)
                 logging.info(f"Worker shutdown, resources left: {resources}")
             else:
@@ -65,7 +67,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
             logging.info(traceback.format_exc())
             return
 
-    @synchronized(_lock)
+    @_synchronized(_lock)
     def welcome_new_worker(self, worker_details: Dict) -> None:
         """Process a new worker and either accept or reject
         Accept: add to list of workers
@@ -76,21 +78,21 @@ class _MasterServer(socketserver.BaseRequestHandler):
         """
         global _resources, _workers
         try:
-            new_worker = workerInfo(
+            new_worker = _WorkerInfo(
                 hash(worker_details["name"] + str(random())),
                 worker_details["name"],
                 worker_details["address"]
             )
-            send_message(encode_dict({"type": ACCEPT, "id": new_worker.id,
-                                      "master_address": self.server.server_address}), new_worker.address)
+            _send_message(_encode_dict({"type": _ACCEPT, "id": new_worker.id,
+                                        "master_address": self.server.server_address}), new_worker.address)
             _workers[new_worker.id] = new_worker
             _resources += 1
             logging.info("Resources at welcome new worker: %d", _resources)
         except Exception as e:
-            self.request.sendall(encode_dict({"type": REJECT}))
+            self.request.sendall(_encode_dict({"type": _REJECT}))
             logging.info(f"Could not instantiate new worker: {e}")
 
-    @synchronized(_lock)
+    @_synchronized(_lock)
     def delegate_task(self, ask: Dict) -> int:
         """Delegate tasks to each worker
         All tasks are currently split evenly between workers
@@ -113,16 +115,16 @@ class _MasterServer(socketserver.BaseRequestHandler):
 
         for worker, (i, data) in zip(_workers.values(), enumerate(array_split)):
             # assume worker will always accept work
-            work_request = {"type": DELEGATE_WORK, "work_id": work_id,
+            work_request = {"type": _DELEGATE_WORK, "work_id": work_id,
                             "function": func, "array": data, "order": i}
-            send_message(encode_dict(work_request), worker.address)
+            _send_message(_encode_dict(work_request), worker.address)
 
-        _work_orders[work_id] = WorkOrder(_resources, event)
+        _work_orders[work_id] = _WorkOrder(_resources, event)
         logging.info(_work_orders[work_id])
 
         return work_id
 
-    @synchronized(_lock)
+    @_synchronized(_lock)
     def recieve_completed_task(self, ask: Dict) -> None:
         """Recieve a completed task from a worker
 
@@ -138,7 +140,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
         if _work_orders[work_id].progress == 1:
             _work_orders[work_id].event.set()
 
-    @synchronized(_lock)
+    @_synchronized(_lock)
     def remove_worker(self, ask: Dict) -> int:
         """Remove worker by decrementing resource count and removing from the worker db
 
@@ -152,6 +154,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
         _workers.pop(ask["id"])
 
         return _resources
+
 
 class _ThreadedMasterServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass

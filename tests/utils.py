@@ -1,8 +1,7 @@
-from doctest import master
 import socket
 from typing import Dict, Tuple
-from overkill.utils.server_messaging_standards import ACCEPT_WORK, DELEGATE_WORK, FINISHED_TASK, NEW_CONNECTION
-from overkill.utils.utils import decode_message, encode_dict, send_message
+from overkill.utils.server_messaging_standards import _ACCEPT_WORK, _DELEGATE_WORK, _FINISHED_TASK, _NEW_CONNECTION
+from overkill.utils.utils import _decode_message, _encode_dict, _send_message
 
 
 class MockWorker:
@@ -25,18 +24,20 @@ class MockWorker:
         :raises Exception: no data recieved from master
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(5)
             s.bind((self.address))
             s.listen()
             conn, addr = s.accept()
             with conn:
-                data = decode_message(conn.recv(1024))
+                data = _decode_message(conn.recv(1024))
                 print(data)
                 if not data:
                     raise Exception("No data recieved from master")
-                if data["type"] == DELEGATE_WORK:
+                if data["type"] == _DELEGATE_WORK:
                     result = map(data["function"], data["array"])
-                    msg = {"type": ACCEPT_WORK, "work_id": data["work_id"], "data": result, "order": data["order"]}
-                    send_message(encode_dict(msg), self.master_address)
+                    msg = {
+                        "type": _ACCEPT_WORK, "work_id": data["work_id"], "data": result, "order": data["order"]}
+                    _send_message(_encode_dict(msg), self.master_address)
                 self.recieved = data
 
     def connect_to_master(self, master_address: Tuple[str, int]) -> None:
@@ -47,9 +48,10 @@ class MockWorker:
         """
         self.master_address = master_address
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            connection_message = {"type": NEW_CONNECTION, "name": "test", "address": self.address}
+            connection_message = {"type": _NEW_CONNECTION,
+                                  "name": "test", "address": self.address}
             sock.connect(master_address)
-            sock.sendall(encode_dict(connection_message))
+            sock.sendall(_encode_dict(connection_message))
             print("Sent: {}".format(connection_message))
 
 
@@ -73,14 +75,15 @@ class MockMaster:
         :raises Exception: no data recieved from master
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(5)
             s.bind((self.address))
             s.listen()
             conn, addr = s.accept()
             with conn:
-                data = decode_message(conn.recv(1024))
+                data = _decode_message(conn.recv(1024))
                 print(data)
                 if not data:
                     raise Exception("No data recieved from master")
-                msg = encode_dict({"type": FINISHED_TASK})
+                msg = _encode_dict({"type": _FINISHED_TASK})
                 conn.sendall(msg)
                 self.recieved = data

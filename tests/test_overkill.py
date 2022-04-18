@@ -55,4 +55,4 @@ def test_map():
     cc.map("foo", "bar")
     t.join()
 
-    assert m.recieved["type"] == server_messaging_standards.DISTRIBUTE
+    assert m.recieved["type"] == server_messaging_standards._DISTRIBUTE

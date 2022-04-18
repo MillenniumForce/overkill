@@ -4,11 +4,10 @@ import functools
 import socket
 import threading
 from typing import Any, Dict, List, Tuple
-from overkill.utils.server_messaging_standards import ENCODING
 import dill
 
 
-def send_message(message: bytes, address: Tuple[str, int]) -> None:
+def _send_message(message: bytes, address: Tuple[str, int]) -> None:
     """Send a message to an arbitrary address.
     Warning: does not handle any exceptions
 
@@ -23,7 +22,7 @@ def send_message(message: bytes, address: Tuple[str, int]) -> None:
     s.close()
 
 
-def encode_dict(d: Dict) -> bytes:
+def _encode_dict(d: Dict) -> bytes:
     """Ecode the dictionary using dill.
     Dill is used to ensure that functions are encoded correctly
     Warning: does not handle any exceptions
@@ -36,7 +35,7 @@ def encode_dict(d: Dict) -> bytes:
     return dill.dumps(d)
 
 
-def decode_message(b: bytes) -> Any:
+def _decode_message(b: bytes) -> Any:
     """Decode arbitrary bytes using Dill.
     Most common usecase is to decode a message.
     Dill is used to ensure functions are decoded correctly
@@ -51,12 +50,12 @@ def decode_message(b: bytes) -> Any:
 
 
 # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
-def flatten(lst: List) -> List:
+def _flatten(lst: List) -> List:
     """Flatten an arbitrary 2D list
 
     E.g. [[1], [2], [3]] = [1, 2, 3]
 
-    :param lst: list to flatten
+    :param lst: list to _flatten
     :type lst: List
     :return: flattened list
     :rtype: List
@@ -65,7 +64,7 @@ def flatten(lst: List) -> List:
 
 
 # https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
-def synchronized(lock: threading.Lock) -> callable:
+def _synchronized(lock: threading.Lock) -> callable:
     """Synchronization wrapper
 
     :param lock: lock to acquire for synchronization
