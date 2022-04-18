@@ -41,8 +41,8 @@ class ClusterCompute:
                 "array": array
             }
             sock.connect(self.master_address)
-            sock.sendall(utils._encode_dict(connection_message))
-            result = utils._decode_message(sock.recv(10000))
+            utils._socket_send_message(utils._encode_dict(connection_message), sock)
+            result = utils._decode_message(utils._recv_msg(sock))
         return self.__handle_result(result)
 
     def __handle_result(self, result: Dict) -> List:

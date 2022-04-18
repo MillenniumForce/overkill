@@ -14,8 +14,8 @@ from overkill.utils.server_messaging_standards import (_DISTRIBUTE, _NEW_CONNECT
                                                        _REJECT, _ACCEPT, _ACCEPT_WORK,
                                                        _CLOSE_CONNECTION, _DELEGATE_WORK,
                                                        _FINISHED_TASK, _WORK_ERROR)
-from overkill.utils.utils import (_decode_message, _encode_dict, _flatten,
-                                  _send_message, _synchronized)
+from overkill.utils.utils import (_decode_message, _encode_dict, _flatten, _recv_msg,
+                                  _send_message, _socket_send_message, _synchronized)
 
 
 _resources = 0  # server resources (must be >0)
@@ -37,8 +37,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
         :raises Exception: internal error in master server
         :raises askTypeNotFoundError: occurs when there is no case for an ask type
         """
-        # TODO: what happens if there's more than 1024 bytes
-        data = self.request.recv(1024)
+        data = _recv_msg(self.request)
         try:
             ask = _decode_message(data)
             logging.info(ask)
@@ -48,13 +47,14 @@ class _MasterServer(socketserver.BaseRequestHandler):
                 work_id = self.delegate_task(ask)
                 _work_orders[work_id].event.wait()
                 if _work_orders[work_id].error:
-                    err = {"type": _WORK_ERROR, "error": _work_orders[work_id].error}
-                    self.request.sendall(_encode_dict(err))
+                    err = {"type": _WORK_ERROR,
+                           "error": _work_orders[work_id].error}
+                    _socket_send_message(_encode_dict(err), self.request)
                 data = _flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
                 logging.info(f"Completed task {work_order}")
-                self.request.sendall(_encode_dict(
-                    {"type": _FINISHED_TASK, "data": data}))
+                _socket_send_message(
+                    _encode_dict({"type": _FINISHED_TASK, "data": data}), self.request)
             elif ask["type"] == _ACCEPT_WORK:
                 self.recieve_completed_task(ask)
             elif ask["type"] == _CLOSE_CONNECTION:
@@ -94,7 +94,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
             _resources += 1
             logging.info("Resources at welcome new worker: %d", _resources)
         except Exception as e:
-            self.request.sendall(_encode_dict({"type": _REJECT}))
+            _socket_send_message(_encode_dict({"type": _REJECT}), self.request)
             logging.info(f"Could not instantiate new worker: {e}")
 
     @_synchronized(_lock)
@@ -159,7 +159,7 @@ class _MasterServer(socketserver.BaseRequestHandler):
         _workers.pop(ask["id"])
 
         return _resources
-    
+
     @_synchronized(_lock)
     def handle_work_error(self, ask: Dict) -> None:
         """Handle work error by setting the error message of the work order

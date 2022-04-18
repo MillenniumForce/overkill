@@ -17,6 +17,18 @@ def test(address):
         connection_message = {"type": server_messaging_standards._DISTRIBUTE,
                               "function": f_no_globals, "array": [1, 2, 3, 4, 5]}
         sock.connect(address)
-        sock.sendall(utils._encode_dict(connection_message))
+        enc = utils._encode_dict(connection_message)
+        sock.sendall(len(enc))
         msg = utils._decode_message(sock.recv(10000))
         print(msg)
+
+
+def connect(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("localhost", port))
+    s.listen()
+    conn, addr = s.accept()
+    from overkill.utils.utils import _recv_msg
+    msg = _recv_msg(conn)
+    s.close()
+    return msg

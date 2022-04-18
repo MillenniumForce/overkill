@@ -1,7 +1,7 @@
 import socket
-from typing import Dict, Tuple
+from typing import Tuple
 from overkill.utils.server_messaging_standards import _ACCEPT_WORK, _DELEGATE_WORK, _FINISHED_TASK, _NEW_CONNECTION
-from overkill.utils.utils import _decode_message, _encode_dict, _send_message
+from overkill.utils.utils import _decode_message, _encode_dict, _recv_msg, _send_message, _socket_send_message
 
 
 class MockWorker:
@@ -29,7 +29,7 @@ class MockWorker:
             s.listen()
             conn, addr = s.accept()
             with conn:
-                data = _decode_message(conn.recv(1024))
+                data = _decode_message(_recv_msg(conn))
                 print(data)
                 if not data:
                     raise Exception("No data recieved from master")
@@ -47,12 +47,10 @@ class MockWorker:
         :type master_address: Tuple[str, int]
         """
         self.master_address = master_address
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            connection_message = {"type": _NEW_CONNECTION,
-                                  "name": "test", "address": self.address}
-            sock.connect(master_address)
-            sock.sendall(_encode_dict(connection_message))
-            print("Sent: {}".format(connection_message))
+        connection_message = {"type": _NEW_CONNECTION,
+                              "name": "test", "address": self.address}
+        _send_message(_encode_dict(connection_message), master_address)
+        print("Sent: {}".format(connection_message))
 
 
 class MockMaster:
@@ -80,10 +78,10 @@ class MockMaster:
             s.listen()
             conn, addr = s.accept()
             with conn:
-                data = _decode_message(conn.recv(1024))
+                data = _decode_message(_recv_msg(conn))
                 print(data)
                 if not data:
                     raise Exception("No data recieved from master")
                 msg = _encode_dict({"type": _FINISHED_TASK})
-                conn.sendall(msg)
+                _socket_send_message(msg, conn)
                 self.recieved = data

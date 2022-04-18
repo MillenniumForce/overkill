@@ -14,7 +14,7 @@ from overkill.utils.server_exceptions import AskTypeNotFoundError, ServerNotStar
 from overkill.utils.server_messaging_standards import (_NEW_CONNECTION, _REJECT, _ACCEPT,
                                                        _ACCEPT_WORK, _CLOSE_CONNECTION,
                                                        _DELEGATE_WORK, _WORK_ERROR)
-from overkill.utils.utils import _send_message, _encode_dict, _decode_message
+from overkill.utils.utils import _recv_msg, _send_message, _encode_dict, _decode_message
 
 _master = None  # master info
 _id = None  # worker id
@@ -36,8 +36,7 @@ class _WorkerServer(socketserver.BaseRequestHandler):
         :raises askTypeNotFoundError: occurs when there is no case for an ask type
         """
         global _master, _id
-        # TODO: what happens if there's more than 1024 bytes
-        data = self.request.recv(1024)
+        data = _recv_msg(self.request)
         try:
             ask = _decode_message(data)
             logging.info(ask)
