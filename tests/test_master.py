@@ -3,10 +3,10 @@ import socket
 from threading import Thread
 
 from overkill.servers.master import Master
-from overkill.utils.server_messaging_standards import (_ACCEPT, _DELEGATE_WORK,
-                                                       _DISTRIBUTE,
-                                                       _FINISHED_TASK)
-from overkill.utils.utils import _encode_dict, _decode_message, _recv_msg, _socket_send_message
+from overkill.servers.utils.server_messaging_standards import (_ACCEPT, _DELEGATE_WORK,
+                                                               _DISTRIBUTE,
+                                                               _FINISHED_TASK)
+from overkill.servers.utils.utils import _encode_dict, _decode_message, _recv_msg, _socket_send_message
 from tests.utils import MockWorker
 
 

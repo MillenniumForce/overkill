@@ -1,6 +1,6 @@
 import socket
-from overkill.utils import utils
-from overkill.utils import server_messaging_standards
+from overkill.servers.utils import utils
+from overkill.servers.utils import server_messaging_standards
 import types
 
 
@@ -28,7 +28,7 @@ def connect(port):
     s.bind(("localhost", port))
     s.listen()
     conn, addr = s.accept()
-    from overkill.utils.utils import _recv_msg
+    from overkill.servers.utils.utils import _recv_msg
     msg = _recv_msg(conn)
     s.close()
     return msg

@@ -13,9 +13,9 @@ from overkill import overkill
 from overkill import cli
 from overkill.servers.master import Master
 from overkill.servers.worker import Worker
-from overkill.utils import server_messaging_standards
-from overkill.utils.server_exceptions import NoWorkersError, WorkError
-from overkill.utils.utils import _encode_dict
+from overkill.servers.utils import server_messaging_standards
+from overkill.servers.utils.server_exceptions import NoWorkersError, WorkError
+from overkill.servers.utils.utils import _encode_dict
 from tests.utils import MockMaster, MockWorker
 
 
@@ -62,6 +62,7 @@ def test_map():
     t.join()
 
     assert m.recieved["type"] == server_messaging_standards._DISTRIBUTE
+
 
 def test_work_error():
     """Test should raise a WorkError since the user has mispspecified the function for map"""

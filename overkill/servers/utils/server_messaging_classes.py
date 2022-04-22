@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from typing import Callable, List
-from overkill.utils.server_messaging_standards import _DISTRIBUTE, _NEW_CONNECTION
+from overkill.servers.utils.server_messaging_standards import _DISTRIBUTE, _NEW_CONNECTION
 
 
 @dataclass(frozen=True)

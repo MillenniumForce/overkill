@@ -5,12 +5,12 @@ See the :class:`ClusterCompute` for more details on distributing tasks.
 import socket
 from typing import Callable, Dict, List, Tuple, Union
 
-from overkill.utils.server_exceptions import NoWorkersError, WorkError
-from overkill.utils.server_messaging_standards import (_DISTRIBUTE,
-                                                       _FINISHED_TASK,
-                                                       _NO_WORKERS_ERROR,
-                                                       _WORK_ERROR)
-from overkill.utils.utils import _decode_message, _encode_dict, _recv_msg, _socket_send_message
+from overkill.servers.utils.server_exceptions import NoWorkersError, WorkError
+from overkill.servers.utils.server_messaging_standards import (_DISTRIBUTE,
+                                                               _FINISHED_TASK,
+                                                               _NO_WORKERS_ERROR,
+                                                               _WORK_ERROR)
+from overkill.servers.utils.utils import _decode_message, _encode_dict, _recv_msg, _socket_send_message
 
 
 class ClusterCompute:

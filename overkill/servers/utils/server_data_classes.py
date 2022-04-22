@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from threading import Event
 from typing import Any, List, Tuple, Union
 
-from overkill.utils.server_exceptions import WorkError
+from overkill.servers.utils.server_exceptions import WorkError
 
 
 @dataclass
