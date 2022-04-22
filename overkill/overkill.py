@@ -5,12 +5,13 @@ See the :class:`ClusterCompute` for more details on distributing tasks.
 import socket
 from typing import Callable, Dict, List, Tuple, Union
 
-from overkill.utils.server_exceptions import NoWorkersError, WorkError
-from overkill.utils.server_messaging_standards import (_DISTRIBUTE,
-                                                       _FINISHED_TASK,
-                                                       _NO_WORKERS_ERROR,
-                                                       _WORK_ERROR)
-from overkill.utils.utils import _decode_message, _encode_dict, _recv_msg, _socket_send_message
+from overkill.servers._server_exceptions import NoWorkersError, WorkError
+from overkill.servers._server_messaging_standards import (DISTRIBUTE,
+                                                          FINISHED_TASK,
+                                                          NO_WORKERS_ERROR,
+                                                          WORK_ERROR)
+from overkill.servers._utils import (decode_message, encode_dict, recv_msg,
+                                     socket_send_message)
 
 
 class ClusterCompute:
@@ -41,13 +42,13 @@ class ClusterCompute:
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             connection_message = {
-                "type": _DISTRIBUTE,
+                "type": DISTRIBUTE,
                 "function": function,
                 "array": array
             }
             sock.connect(self.master_address)
-            _socket_send_message(_encode_dict(connection_message), sock)
-            result = _decode_message(_recv_msg(sock))
+            socket_send_message(encode_dict(connection_message), sock)
+            result = decode_message(recv_msg(sock))
         return self.__handle_result(result)
 
     def __handle_result(self, result: Dict) -> List:
@@ -62,9 +63,9 @@ class ClusterCompute:
         :rtype: List
         """
         return_type = result.get("type")
-        if return_type == _FINISHED_TASK:
+        if return_type == FINISHED_TASK:
             return result.get("data")
-        if return_type == _WORK_ERROR:
+        if return_type == WORK_ERROR:
             raise WorkError(result.get("error"))
-        if return_type == _NO_WORKERS_ERROR:
+        if return_type == NO_WORKERS_ERROR:
             raise NoWorkersError("There are no workers connected to master")

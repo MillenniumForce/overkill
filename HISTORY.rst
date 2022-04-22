@@ -44,5 +44,11 @@ Notes: could be optimised further but experimentation is required
 
 0.3.4 (2022-04-18)
 ------------------
+
 * Added error when a user tries to distribute a task when there are no workers,
 user should now recieve a NoWorkersError
+
+0.4.0 (2022-04-23)
+------------------
+
+* Abstracted master and worker classes into _master and _worker files respectively

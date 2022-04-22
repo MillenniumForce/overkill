@@ -2,13 +2,13 @@
 
 from dataclasses import dataclass, field
 from threading import Event
-from typing import Any, List, Tuple, Union
+from typing import List, Tuple, Union
 
-from overkill.utils.server_exceptions import WorkError
+from overkill.servers._server_exceptions import WorkError
 
 
 @dataclass
-class _WorkerInfo:
+class WorkerInfo:
     """Worker inforamtion class"""
     id: str
     name: str
@@ -17,13 +17,13 @@ class _WorkerInfo:
 
 
 @dataclass
-class _MasterInfo:
+class MasterInfo:
     """Master information class"""
     address: Tuple
 
 
 @dataclass
-class _WorkOrder:
+class WorkOrder:
     """Class documents information about a work order from a client"""
     num_workers: int
     event: Event
