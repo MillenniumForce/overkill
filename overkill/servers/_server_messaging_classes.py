@@ -2,17 +2,17 @@
 
 from dataclasses import dataclass
 from typing import Callable, List
-from overkill.servers.utils.server_messaging_standards import _DISTRIBUTE, _NEW_CONNECTION
+from overkill.servers._server_messaging_standards import DISTRIBUTE, NEW_CONNECTION
 
 
 @dataclass(frozen=True)
 class ask_distribute:
     function: Callable
     array: List
-    type: str = _DISTRIBUTE
+    type: str = DISTRIBUTE
 
 
 @dataclass(frozen=True)
 class ask_new_connection:
     name: str
-    type: str = _NEW_CONNECTION
+    type: str = NEW_CONNECTION

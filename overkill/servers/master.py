@@ -4,7 +4,7 @@ import logging
 import threading
 from typing import Tuple
 
-from overkill.servers.utils.server_exceptions import ServerAlreadyStartedError
+from overkill.servers._server_exceptions import ServerAlreadyStartedError
 
 from ._master import MasterServer, ThreadedMasterServer, reset_globals
 

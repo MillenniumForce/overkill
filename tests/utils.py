@@ -1,7 +1,12 @@
 import socket
 from typing import Tuple
-from overkill.servers.utils.server_messaging_standards import _ACCEPT_WORK, _DELEGATE_WORK, _FINISHED_TASK, _NEW_CONNECTION
-from overkill.servers.utils.utils import _decode_message, _encode_dict, _recv_msg, _send_message, _socket_send_message
+
+from overkill.servers._server_messaging_standards import (ACCEPT_WORK,
+                                                          DELEGATE_WORK,
+                                                          FINISHED_TASK,
+                                                          NEW_CONNECTION)
+from overkill.servers._utils import (decode_message, encode_dict, recv_msg,
+                                     send_message, socket_send_message)
 
 
 class MockWorker:
@@ -29,15 +34,15 @@ class MockWorker:
             s.listen()
             conn, addr = s.accept()
             with conn:
-                data = _decode_message(_recv_msg(conn))
+                data = decode_message(recv_msg(conn))
                 print(data)
                 if not data:
                     raise Exception("No data recieved from master")
-                if data["type"] == _DELEGATE_WORK:
+                if data["type"] == DELEGATE_WORK:
                     result = map(data["function"], data["array"])
                     msg = {
-                        "type": _ACCEPT_WORK, "work_id": data["work_id"], "data": result, "order": data["order"]}
-                    _send_message(_encode_dict(msg), self.master_address)
+                        "type": ACCEPT_WORK, "work_id": data["work_id"], "data": result, "order": data["order"]}
+                    send_message(encode_dict(msg), self.master_address)
                 self.recieved = data
 
     def connect_to_master(self, master_address: Tuple[str, int]) -> None:
@@ -47,9 +52,9 @@ class MockWorker:
         :type master_address: Tuple[str, int]
         """
         self.master_address = master_address
-        connection_message = {"type": _NEW_CONNECTION,
+        connection_message = {"type": NEW_CONNECTION,
                               "name": "test", "address": self.address}
-        _send_message(_encode_dict(connection_message), master_address)
+        send_message(encode_dict(connection_message), master_address)
         print("Sent: {}".format(connection_message))
 
 
@@ -78,10 +83,10 @@ class MockMaster:
             s.listen()
             conn, addr = s.accept()
             with conn:
-                data = _decode_message(_recv_msg(conn))
+                data = decode_message(recv_msg(conn))
                 print(data)
                 if not data:
                     raise Exception("No data recieved from master")
-                msg = _encode_dict({"type": _FINISHED_TASK})
-                _socket_send_message(msg, conn)
+                msg = encode_dict({"type": FINISHED_TASK})
+                socket_send_message(msg, conn)
                 self.recieved = data

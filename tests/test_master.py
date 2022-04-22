@@ -2,11 +2,13 @@ import random
 import socket
 from threading import Thread
 
+from overkill.servers._server_messaging_standards import (ACCEPT,
+                                                          DELEGATE_WORK,
+                                                          DISTRIBUTE,
+                                                          FINISHED_TASK)
+from overkill.servers._utils import (decode_message, encode_dict, recv_msg,
+                                     socket_send_message)
 from overkill.servers.master import Master
-from overkill.servers.utils.server_messaging_standards import (_ACCEPT, _DELEGATE_WORK,
-                                                               _DISTRIBUTE,
-                                                               _FINISHED_TASK)
-from overkill.servers.utils.utils import _encode_dict, _decode_message, _recv_msg, _socket_send_message
 from tests.utils import MockWorker
 
 
@@ -31,7 +33,7 @@ def test_new_worker():
     w.connect_to_master(m.get_address())
     t.join()
 
-    assert(w.recieved["type"] == _ACCEPT)
+    assert(w.recieved["type"] == ACCEPT)
 
     m.stop()
 
@@ -53,19 +55,19 @@ def test_recieve_work():
     t.start()
     w.connect_to_master(m.get_address())
     t.join()
-    assert w.recieved["type"] == _ACCEPT
+    assert w.recieved["type"] == ACCEPT
 
     # 2: recieve work from master
     t = Thread(target=w.recieve_connection, daemon=True)
     t.start()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(m.get_address())
-        _socket_send_message(_encode_dict(
-            {"type": _DISTRIBUTE, "function": f, "array": list(range(0, 10000))}), sock)
-        msg = _decode_message(_recv_msg(sock))
-        assert msg["type"] == _FINISHED_TASK
+        socket_send_message(encode_dict(
+            {"type": DISTRIBUTE, "function": f, "array": list(range(0, 10000))}), sock)
+        msg = decode_message(recv_msg(sock))
+        assert msg["type"] == FINISHED_TASK
     t.join()
-    assert w.recieved["type"] == _DELEGATE_WORK
+    assert w.recieved["type"] == DELEGATE_WORK
 
     m.stop()
 

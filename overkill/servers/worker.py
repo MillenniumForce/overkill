@@ -4,10 +4,10 @@ import logging
 import threading
 from typing import Tuple
 
-from overkill.servers.utils.server_exceptions import (
-    ServerAlreadyStartedError, ServerNotStartedError)
-from overkill.servers.utils.server_messaging_standards import _NEW_CONNECTION
-from overkill.servers.utils.utils import _encode_dict, _send_message
+from overkill.servers._server_exceptions import (ServerAlreadyStartedError,
+                                                 ServerNotStartedError)
+from overkill.servers._server_messaging_standards import NEW_CONNECTION
+from overkill.servers._utils import encode_dict, send_message
 
 from ._worker import (ThreadedWorkerServer, WorkerServer,
                       close_connection_with_master, reset_globals)
@@ -77,10 +77,10 @@ class Worker:
         """
         if self._server is None:
             raise ServerNotStartedError("No server has been started")
-        connection_message = {"type": _NEW_CONNECTION,
+        connection_message = {"type": NEW_CONNECTION,
                               "name": self.name, "address": self.get_address()}
         try:
-            _send_message(_encode_dict(connection_message), (ip, port))
+            send_message(encode_dict(connection_message), (ip, port))
         except ConnectionRefusedError:
             raise ConnectionRefusedError(
                 "Please check if the master address is correct")

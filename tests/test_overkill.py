@@ -3,20 +3,18 @@
 """Tests for `overkill` package."""
 
 import random
-from threading import Thread
 import time
-import pytest
+from threading import Thread
 
+import pytest
 from click.testing import CliRunner
 
-from overkill import overkill
-from overkill import cli
+from overkill import cli, overkill
+from overkill.servers._server_exceptions import NoWorkersError, WorkError
+from overkill.servers._server_messaging_standards import DISTRIBUTE
 from overkill.servers.master import Master
 from overkill.servers.worker import Worker
-from overkill.servers.utils import server_messaging_standards
-from overkill.servers.utils.server_exceptions import NoWorkersError, WorkError
-from overkill.servers.utils.utils import _encode_dict
-from tests.utils import MockMaster, MockWorker
+from tests.utils import MockMaster
 
 
 @pytest.fixture
@@ -61,7 +59,7 @@ def test_map():
     cc.map("foo", "bar")
     t.join()
 
-    assert m.recieved["type"] == server_messaging_standards._DISTRIBUTE
+    assert m.recieved["type"] == DISTRIBUTE
 
 
 def test_work_error():

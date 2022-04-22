@@ -4,17 +4,14 @@ import socketserver
 import traceback
 from typing import Dict, List
 
-from overkill.servers.utils.server_data_classes import _MasterInfo
-from overkill.servers.utils.server_exceptions import (AskTypeNotFoundError,
-                                                      WorkError)
-from overkill.servers.utils.server_messaging_standards import (_ACCEPT,
-                                                               _ACCEPT_WORK, _CLOSE_CONNECTION,
-                                                               _DELEGATE_WORK,
-                                                               _REJECT,
-                                                               _WORK_ERROR)
-from overkill.servers.utils.utils import (_decode_message, _encode_dict,
-                                          _recv_msg, _send_message)
-
+from overkill.servers._server_data_classes import MasterInfo
+from overkill.servers._server_exceptions import AskTypeNotFoundError, WorkError
+from overkill.servers._server_messaging_standards import (ACCEPT, ACCEPT_WORK,
+                                                          CLOSE_CONNECTION,
+                                                          DELEGATE_WORK,
+                                                          REJECT, WORK_ERROR)
+from overkill.servers._utils import (decode_message, encode_dict, recv_msg,
+                                     send_message)
 
 __all__ = [
     "WorkerServer",
@@ -43,35 +40,35 @@ class WorkerServer(socketserver.BaseRequestHandler):
         :raises askTypeNotFoundError: occurs when there is no case for an ask type
         """
         global _master, _id
-        data = _recv_msg(self.request)
+        data = recv_msg(self.request)
         try:
-            ask = _decode_message(data)
+            ask = decode_message(data)
             logging.info(ask)
 
-            if ask["type"] == _REJECT:
+            if ask["type"] == REJECT:
                 raise Exception("Worker rejected")
 
-            elif ask["type"] == _ACCEPT:
+            elif ask["type"] == ACCEPT:
                 address = ask["master_address"]
-                _master = _MasterInfo(address)
+                _master = MasterInfo(address)
                 logging.info(f"Master information: {_master}")
                 _id = ask["id"]
 
-            elif ask["type"] == _DELEGATE_WORK:
+            elif ask["type"] == DELEGATE_WORK:
                 results = _do_work(ask)
-                _send_message(_encode_dict(
-                    {"type": _ACCEPT_WORK, "work_id": ask["work_id"], "data": results, "order": ask["order"]}), _master.address)
+                send_message(encode_dict(
+                    {"type": ACCEPT_WORK, "work_id": ask["work_id"], "data": results, "order": ask["order"]}), _master.address)
 
             else:
                 raise AskTypeNotFoundError(f"No such type {ask['type']}")
-                
+
         except AskTypeNotFoundError as e:
             logging.info(f"No such ask exists: {e}")
             return
         except WorkError as e:
             logging.info(f"Encountered work error: {e}")
-            err = {"type": _WORK_ERROR, "work_id": ask["work_id"], "error": e}
-            _send_message(_encode_dict(err), _master.address)
+            err = {"type": WORK_ERROR, "work_id": ask["work_id"], "error": e}
+            send_message(encode_dict(err), _master.address)
         except Exception as e:
             logging.info(f"Could not handle request: {e}")
             logging.info(traceback.format_exc())
@@ -114,7 +111,7 @@ def reset_globals() -> None:
 def close_connection_with_master() -> None:
     """Close connection with master"""
     if _master:
-        msg = _encode_dict({"type": _CLOSE_CONNECTION, "id": _id})
-        _send_message(msg, _master.address)
+        msg = encode_dict({"type": CLOSE_CONNECTION, "id": _id})
+        send_message(msg, _master.address)
     else:
         logging.info("No master started, skipping closing message")

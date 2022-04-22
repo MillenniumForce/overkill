@@ -8,14 +8,19 @@ from math import ceil
 from random import random
 from typing import Dict, Tuple
 
-from overkill.servers.utils.server_data_classes import _WorkerInfo, _WorkOrder
-from overkill.servers.utils.server_exceptions import AskTypeNotFoundError
-from overkill.servers.utils.server_messaging_standards import (
-    _ACCEPT, _ACCEPT_WORK, _CLOSE_CONNECTION, _DELEGATE_WORK, _DISTRIBUTE,
-    _FINISHED_TASK, _NEW_CONNECTION, _NO_WORKERS_ERROR, _REJECT, _WORK_ERROR)
-from overkill.servers.utils.utils import (_decode_message, _encode_dict,
-                                          _flatten, _recv_msg, _send_message,
-                                          _socket_send_message, _synchronized)
+from overkill.servers._server_data_classes import WorkerInfo, WorkOrder
+from overkill.servers._server_exceptions import AskTypeNotFoundError
+from overkill.servers._server_messaging_standards import (ACCEPT, ACCEPT_WORK,
+                                                          CLOSE_CONNECTION,
+                                                          DELEGATE_WORK,
+                                                          DISTRIBUTE,
+                                                          FINISHED_TASK,
+                                                          NEW_CONNECTION,
+                                                          NO_WORKERS_ERROR,
+                                                          REJECT, WORK_ERROR)
+from overkill.servers._utils import (decode_message, encode_dict, flatten,
+                                     recv_msg, send_message,
+                                     socket_send_message, synchronized)
 
 
 __all__ = [
@@ -25,7 +30,7 @@ __all__ = [
 
 
 _resources = 0  # server resources (must be >0)
-_workers = {}  # dict of worker_id: _WorkerInfo
+_workers = {}  # dict of worker_id: WorkerInfo
 _work_orders = {}  # dict of work_id: workOrder
 _lock = threading.Lock()
 
@@ -46,40 +51,40 @@ class MasterServer(socketserver.BaseRequestHandler):
         :raises Exception: internal error in master server
         :raises askTypeNotFoundError: occurs when there is no case for an ask type
         """
-        data = _recv_msg(self.request)
+        data = recv_msg(self.request)
         try:
-            ask = _decode_message(data)
+            ask = decode_message(data)
             logging.info(ask)
 
-            if ask["type"] == _NEW_CONNECTION:
+            if ask["type"] == NEW_CONNECTION:
                 _welcome_new_worker(ask, self.server.server_address)
 
-            elif ask["type"] == _DISTRIBUTE:
+            elif ask["type"] == DISTRIBUTE:
                 if len(_workers) == 0:
-                    err = {"type": _NO_WORKERS_ERROR}
-                    _socket_send_message(_encode_dict(err), self.request)
+                    err = {"type": NO_WORKERS_ERROR}
+                    socket_send_message(encode_dict(err), self.request)
                     return
                 work_id = _delegate_task(ask)
                 _work_orders[work_id].event.wait()
                 if _work_orders[work_id].error:
-                    err = {"type": _WORK_ERROR,
+                    err = {"type": WORK_ERROR,
                            "error": _work_orders[work_id].error}
-                    _socket_send_message(_encode_dict(err), self.request)
+                    socket_send_message(encode_dict(err), self.request)
                     return
-                data = _flatten(_work_orders[work_id].data)
+                data = flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
                 logging.info(f"Completed task {work_order}")
-                _socket_send_message(
-                    _encode_dict({"type": _FINISHED_TASK, "data": data}), self.request)
+                socket_send_message(
+                    encode_dict({"type": FINISHED_TASK, "data": data}), self.request)
 
-            elif ask["type"] == _ACCEPT_WORK:
+            elif ask["type"] == ACCEPT_WORK:
                 _recieve_completed_task(ask)
 
-            elif ask["type"] == _CLOSE_CONNECTION:
+            elif ask["type"] == CLOSE_CONNECTION:
                 resources = _remove_worker(ask)
                 logging.info(f"Worker shutdown, resources left: {resources}")
 
-            elif ask["type"] == _WORK_ERROR:
+            elif ask["type"] == WORK_ERROR:
                 _handle_work_error(ask)
 
             else:
@@ -94,7 +99,7 @@ class MasterServer(socketserver.BaseRequestHandler):
             return
 
 
-@_synchronized(_lock)
+@synchronized(_lock)
 def _welcome_new_worker(worker_details: Dict, master_address: Tuple[str, int]) -> None:
     """Process a new worker and either accept or reject
     Accept: add to list of workers
@@ -107,22 +112,22 @@ def _welcome_new_worker(worker_details: Dict, master_address: Tuple[str, int]) -
     """
     global _resources, _workers
     try:
-        new_worker = _WorkerInfo(
+        new_worker = WorkerInfo(
             hash(worker_details["name"] + str(random())),
             worker_details["name"],
             worker_details["address"]
         )
-        _send_message(_encode_dict({"type": _ACCEPT, "id": new_worker.id,
-                                    "master_address": master_address}), new_worker.address)
+        send_message(encode_dict({"type": ACCEPT, "id": new_worker.id,
+                                  "master_address": master_address}), new_worker.address)
         _workers[new_worker.id] = new_worker
         _resources += 1
         logging.info("Resources at welcome new worker: %d", _resources)
     except Exception as e:
-        _send_message(_encode_dict({"type": _REJECT}), new_worker.address)
+        send_message(encode_dict({"type": REJECT}), new_worker.address)
         logging.info(f"Could not instantiate new worker: {e}")
 
 
-@_synchronized(_lock)
+@synchronized(_lock)
 def _delegate_task(ask: Dict) -> int:
     """Delegate tasks to each worker
     All tasks are currently split evenly between workers
@@ -145,17 +150,17 @@ def _delegate_task(ask: Dict) -> int:
 
     for worker, (i, data) in zip(_workers.values(), enumerate(array_split)):
         # assume worker will always accept work
-        work_request = {"type": _DELEGATE_WORK, "work_id": work_id,
+        work_request = {"type": DELEGATE_WORK, "work_id": work_id,
                         "function": func, "array": data, "order": i}
-        _send_message(_encode_dict(work_request), worker.address)
+        send_message(encode_dict(work_request), worker.address)
 
-    _work_orders[work_id] = _WorkOrder(_resources, event)
+    _work_orders[work_id] = WorkOrder(_resources, event)
     logging.info(_work_orders[work_id])
 
     return work_id
 
 
-@_synchronized(_lock)
+@synchronized(_lock)
 def _recieve_completed_task(ask: Dict) -> None:
     """Recieve a completed task from a worker
 
@@ -172,7 +177,7 @@ def _recieve_completed_task(ask: Dict) -> None:
         _work_orders[work_id].event.set()
 
 
-@_synchronized(_lock)
+@synchronized(_lock)
 def _remove_worker(ask: Dict) -> int:
     """Remove worker by decrementing resource count and removing from the worker db
 
@@ -188,7 +193,7 @@ def _remove_worker(ask: Dict) -> int:
     return _resources
 
 
-@_synchronized(_lock)
+@synchronized(_lock)
 def _handle_work_error(ask: Dict) -> None:
     """Handle work error by setting the error message of the work order
     and by setting the work_id thread to true
