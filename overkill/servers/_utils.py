@@ -9,7 +9,9 @@ import dill
 
 # sending and recieving data adapted from:
 # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-def _send_message(message: bytes, address: Tuple[str, int]) -> None:
+
+
+def send_message(message: bytes, address: Tuple[str, int]) -> None:
     """Send a message to an arbitrary address. Function also
     prepends 4 bytes which includes the size of the message.
     Warning: does not handle any exceptions
@@ -25,7 +27,7 @@ def _send_message(message: bytes, address: Tuple[str, int]) -> None:
         s.sendall(message)
 
 
-def _socket_send_message(message: bytes, sock: socket.socket) -> None:
+def socket_send_message(message: bytes, sock: socket.socket) -> None:
     """Send a message using a connected socket. Function also
     prepends 4 bytes which includes the size of the message.
     Warning: does not handle any exceptions
@@ -39,7 +41,7 @@ def _socket_send_message(message: bytes, sock: socket.socket) -> None:
     sock.sendall(message)
 
 
-def _recv_msg(sock: socket.socket) -> Union[None, bytearray]:
+def recv_msg(sock: socket.socket) -> Union[None, bytearray]:
     """Recieve a message from the socket
     All messages should be prepended with the length,
     function will keep fetching data until message length
@@ -49,14 +51,14 @@ def _recv_msg(sock: socket.socket) -> Union[None, bytearray]:
     :return: recieved data, or none in case of no data
     :rtype: Union[None, bytearray]
     """
-    raw_msglen = _recvall(sock, 4)
+    raw_msglen = recvall(sock, 4)
     if not raw_msglen:
         return None
     msglen = struct.unpack('>I', raw_msglen)[0]
-    return _recvall(sock, msglen)
+    return recvall(sock, msglen)
 
 
-def _recvall(sock: socket.socket, n: int) -> Union[None, bytearray]:
+def recvall(sock: socket.socket, n: int) -> Union[None, bytearray]:
     """Recieve up to 'n' data
 
     :param sock: connected socket
@@ -75,7 +77,7 @@ def _recvall(sock: socket.socket, n: int) -> Union[None, bytearray]:
     return data
 
 
-def _encode_dict(d: Dict) -> bytes:
+def encode_dict(d: Dict) -> bytes:
     """Ecode the dictionary using dill.
     Dill is used to ensure that functions are encoded correctly
     Warning: does not handle any exceptions
@@ -88,7 +90,7 @@ def _encode_dict(d: Dict) -> bytes:
     return dill.dumps(d)
 
 
-def _decode_message(b: bytes) -> Any:
+def decode_message(b: bytes) -> Any:
     """Decode arbitrary bytes using Dill.
     Most common usecase is to decode a message.
     Dill is used to ensure functions are decoded correctly
@@ -103,12 +105,12 @@ def _decode_message(b: bytes) -> Any:
 
 
 # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
-def _flatten(lst: List) -> List:
+def flatten(lst: List) -> List:
     """Flatten an arbitrary 2D list
 
     E.g. [[1], [2], [3]] = [1, 2, 3]
 
-    :param lst: list to _flatten
+    :param lst: list to flatten
     :type lst: List
     :return: flattened list
     :rtype: List
@@ -117,7 +119,7 @@ def _flatten(lst: List) -> List:
 
 
 # https://stackoverflow.com/questions/489720/what-are-some-common-uses-for-python-decorators/490090#490090
-def _synchronized(lock: threading.Lock) -> callable:
+def synchronized(lock: threading.Lock) -> callable:
     """Synchronization wrapper
 
     :param lock: lock to acquire for synchronization
