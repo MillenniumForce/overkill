@@ -52,3 +52,4 @@ user should now recieve a NoWorkersError
 ------------------
 
 * Abstracted master and worker classes into _master and _worker files respectively
+* Refactored util modules into protected modules
