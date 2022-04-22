@@ -40,13 +40,13 @@ History
 ------------------
 
 * Refactored socket send and recieve protocols to handle large data
+
 Notes: could be optimised further but experimentation is required
 
 0.3.4 (2022-04-18)
 ------------------
 
-* Added error when a user tries to distribute a task when there are no workers,
-user should now recieve a NoWorkersError
+* Added error when a user tries to distribute a task when there are no workers, user should now recieve a NoWorkersError
 
 0.4.0 (2022-04-23)
 ------------------
