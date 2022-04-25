@@ -8,7 +8,7 @@ from math import ceil
 from random import random
 from typing import Dict, Tuple
 
-from overkill.servers._server_data_classes import WorkerInfo, WorkOrder
+from overkill.servers._server_data_classes import WorkerInfo, WorkOrder, WorkError
 from overkill.servers._server_exceptions import AskTypeNotFoundError
 from overkill.servers._server_messaging_standards import (ACCEPT, ACCEPT_WORK,
                                                           CLOSE_CONNECTION,
@@ -64,12 +64,13 @@ class MasterServer(socketserver.BaseRequestHandler):
                     err = {"type": NO_WORKERS_ERROR}
                     socket_send_message(encode_dict(err), self.request)
                     return
-                work_id = _delegate_task(ask)
+                try:
+                    work_id = _delegate_task(ask)
+                except WorkError as e:
+                    self.send_work_error(e)
                 _work_orders[work_id].event.wait()
                 if _work_orders[work_id].error:
-                    err = {"type": WORK_ERROR,
-                           "error": _work_orders[work_id].error}
-                    socket_send_message(encode_dict(err), self.request)
+                    self.send_work_error(_work_orders[work_id].error)
                     return
                 data = flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
@@ -97,6 +98,16 @@ class MasterServer(socketserver.BaseRequestHandler):
             logging.info(f"Could not handle request: {e}")
             logging.info(traceback.format_exc())
             return
+
+    def send_work_error(self, error: WorkError):
+        """Send an error message to the user
+
+        :param error: error message
+        :type error: WorkError
+        """
+        err = {"type": WORK_ERROR,
+               "error": error}
+        socket_send_message(encode_dict(err), self.request)
 
 
 @synchronized(_lock)
@@ -141,12 +152,15 @@ def _delegate_task(ask: Dict) -> int:
     func = ask["function"]
     array = ask["array"]
 
-    logging.info("Array len: %d, num resources: %d",
-                 len(array), _resources)
-    size = ceil(len(array) / _resources)
-    array_split = [array[i: i+size] for i in range(0, len(array), size)]
-    work_id = hash(random())
-    event = threading.Event()
+    try:
+        logging.info("Array len: %d, num resources: %d",
+                     len(array), _resources)
+        size = ceil(len(array) / _resources)
+        array_split = [array[i: i+size] for i in range(0, len(array), size)]
+        work_id = hash(random())
+        event = threading.Event()
+    except Exception as e:
+        raise WorkError(e)
 
     for worker, (i, data) in zip(_workers.values(), enumerate(array_split)):
         # assume worker will always accept work
