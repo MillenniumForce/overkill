@@ -62,13 +62,11 @@ def test_map():
     assert m.recieved["type"] == DISTRIBUTE
 
 
-def test_work_error():
-    """Test should raise a WorkError since the user has mispspecified the function for map"""
+@pytest.mark.parametrize("func, array", [("foo", [1, 2, 3]), ([1, 2, 3], "foo")])
+def test_work_error(func, array):
+    """Test should raise a WorkError given missused input to map"""
     m = Master()
     m.start()
-
-    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-    PORT = random.randint(1024, 65534)
 
     w = Worker("test")
     w.start()
@@ -80,7 +78,7 @@ def test_work_error():
 
     cc = overkill.ClusterCompute(1, m.get_address())
     with pytest.raises(WorkError):
-        cc.map("foo", [1, 2, 3])
+        cc.map(func, array)
 
     m.stop()
 
