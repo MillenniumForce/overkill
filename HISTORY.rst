@@ -40,16 +40,21 @@ History
 ------------------
 
 * Refactored socket send and recieve protocols to handle large data
+
 Notes: could be optimised further but experimentation is required
 
 0.3.4 (2022-04-18)
 ------------------
 
-* Added error when a user tries to distribute a task when there are no workers,
-user should now recieve a NoWorkersError
+* Added error when a user tries to distribute a task when there are no workers, user should now recieve a NoWorkersError
 
 0.4.0 (2022-04-23)
 ------------------
 
 * Abstracted master and worker classes into _master and _worker files respectively
 * Refactored util modules into protected modules
+
+0.4.1 (2022-04-25)
+------------------
+
+* Errors where the user might mispecify the function or array are caught by the Master server and raised with the user
