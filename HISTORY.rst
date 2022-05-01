@@ -63,3 +63,8 @@ Notes: could be optimised further but experimentation is required
 ------------------
 
 * Removed array from WorkOrder repr so logs aren't flooded. There is still a temporary issue that the entire array is printed when an ask is initially sent to master but will be amended in a future release. See issue #37
+
+0.4.3 (2022-05-01)
+------------------
+
+* If the worker cannot notify the master that it is shutting down, log the error instead of spitting out an ugly traceback to the user
