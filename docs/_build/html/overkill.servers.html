@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>overkill.servers package &#8212; Overkill 0.4.0 documentation</title>
+    <title>overkill.servers package &#8212; Overkill 0.4.4 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -73,7 +73,7 @@
       
       
       
-      <h1 class="site-logo" id="site-title">Overkill 0.4.0 documentation</h1>
+      <h1 class="site-logo" id="site-title">Overkill 0.4.4 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -359,6 +359,40 @@ title="Print to PDF"
 <dt class="sig sig-object py" id="overkill.servers.master.Master">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">overkill.servers.master.</span></span><span class="sig-name descname"><span class="pre">Master</span></span><a class="reference internal" href="_modules/overkill/servers/master.html#Master"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.servers.master.Master" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Use this class to start and stop a master server.</p>
+<p>The main methods of the class include <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code> and <code class="docutils literal notranslate"><span class="pre">get_address</span></code>.
+The usage of all the listed methods are fairly intuitive except for <code class="docutils literal notranslate"><span class="pre">get_address</span></code> which is
+mainly used to pass the address tuple to the user or for the worker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">overkill.servers.master</span> <span class="kn">import</span> <span class="n">Master</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Master</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">get_address</span><span class="p">()</span>
+<span class="go">(&#39;127.0.0.1&#39;, 64406)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Note</strong>: in the above example, the master won’t always try to bind to the port 64406.
+The current implementation either lets the kernel decide the port (by default)
+or the user can also decide the port (not recommended).</p>
+<p>Instantiating the class will automatically start logging in ‘master.log’.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the common scenario where you may want to connect to a worker that is on a different
+computer, you must use the local ip address of the computer which should look something
+like 192.168…</p>
+<p>The local ip should be passed as a parameter when using the <code class="docutils literal notranslate"><span class="pre">start</span></code> method of <code class="docutils literal notranslate"><span class="pre">Master</span></code>.</p>
+<p>To find your computers local ip use the command
+<code class="docutils literal notranslate"><span class="pre">ifconfig</span></code> on mac/unix and <code class="docutils literal notranslate"><span class="pre">ipconfig</span></code> on windows.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is not encouraged to have multiple instances of <code class="docutils literal notranslate"><span class="pre">Master</span></code> running in the same Python
+session, do so at your own risk.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="overkill.servers.master.Master.get_address">
 <span class="sig-name descname"><span class="pre">get_address</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/overkill/servers/master.html#Master.get_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.servers.master.Master.get_address" title="Permalink to this definition">#</a></dt>
@@ -403,6 +437,35 @@ title="Print to PDF"
 <dt class="sig sig-object py" id="overkill.servers.worker.Worker">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">overkill.servers.worker.</span></span><span class="sig-name descname"><span class="pre">Worker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/overkill/servers/worker.html#Worker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.servers.worker.Worker" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Use this class to start and stop a worker server.</p>
+<p>The main methods of the class include <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>, <code class="docutils literal notranslate"><span class="pre">get_address`</span>
+<span class="pre">and</span> <span class="pre">``connect_to_master</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">overkill.servers.worker</span> <span class="kn">import</span> <span class="n">Worker</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="o">.</span><span class="n">connect_to_master</span><span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">64406</span><span class="p">)</span> <span class="c1"># ip and port from get_address() method of master</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Instantiating the class will automatically start logging in ‘worker.log’.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the common scenario where you may want to connect to the master that is on a different
+computer, you must use the local ip address of the computer which should look something
+like 192.168…</p>
+<p>The local ip should be passed as a parameter when using the <code class="docutils literal notranslate"><span class="pre">start</span></code> method of <code class="docutils literal notranslate"><span class="pre">Worker</span></code>.</p>
+<p>To find your computers local ip use the command
+<code class="docutils literal notranslate"><span class="pre">ifconfig</span></code> on mac/unix and <code class="docutils literal notranslate"><span class="pre">ipconfig</span></code> on windows.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is not encouraged to have multiple instances of <code class="docutils literal notranslate"><span class="pre">Worker</span></code> running in the same Python
+session, do so at your own risk.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="overkill.servers.worker.Worker.connect_to_master">
 <span class="sig-name descname"><span class="pre">connect_to_master</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/overkill/servers/worker.html#Worker.connect_to_master"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.servers.worker.Worker.connect_to_master" title="Permalink to this definition">#</a></dt>

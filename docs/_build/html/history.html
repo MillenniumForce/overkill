@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>History &#8212; Overkill 0.4.0 documentation</title>
+    <title>History &#8212; Overkill 0.4.4 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -72,7 +72,7 @@
       
       
       
-      <h1 class="site-logo" id="site-title">Overkill 0.4.0 documentation</h1>
+      <h1 class="site-logo" id="site-title">Overkill 0.4.4 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -322,6 +322,26 @@ title="Print to PDF"
    0.4.0 (2022-04-23)
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id10">
+   0.4.1 (2022-04-25)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id11">
+   0.4.2 (2022-04-25)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id12">
+   0.4.3 (2022-05-01)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id13">
+   0.4.4 (2022-05-01)
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -384,6 +404,26 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id9">
    0.4.0 (2022-04-23)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id10">
+   0.4.1 (2022-04-25)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id11">
+   0.4.2 (2022-04-25)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id12">
+   0.4.3 (2022-05-01)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id13">
+   0.4.4 (2022-05-01)
   </a>
  </li>
 </ul>
@@ -455,6 +495,30 @@ title="Print to PDF"
 <ul class="simple">
 <li><p>Abstracted master and worker classes into _master and _worker files respectively</p></li>
 <li><p>Refactored util modules into protected modules</p></li>
+</ul>
+</section>
+<section id="id10">
+<h2>0.4.1 (2022-04-25)<a class="headerlink" href="#id10" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Errors where the user might mispecify the function or array are caught by the Master server and raised with the user</p></li>
+</ul>
+</section>
+<section id="id11">
+<h2>0.4.2 (2022-04-25)<a class="headerlink" href="#id11" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Removed array from WorkOrder repr so logs aren’t flooded. There is still a temporary issue that the entire array is printed when an ask is initially sent to master but will be amended in a future release. See issue #37</p></li>
+</ul>
+</section>
+<section id="id12">
+<h2>0.4.3 (2022-05-01)<a class="headerlink" href="#id12" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>If the worker cannot notify the master that it is shutting down, log the error instead of spitting out an ugly traceback to the user</p></li>
+</ul>
+</section>
+<section id="id13">
+<h2>0.4.4 (2022-05-01)<a class="headerlink" href="#id13" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Updated docs for Master, ClusterCompute and Worker classes</p></li>
 </ul>
 </section>
 </section>

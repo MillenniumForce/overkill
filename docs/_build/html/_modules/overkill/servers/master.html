@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>overkill.servers.master &#8212; Overkill 0.4.0 documentation</title>
+    <title>overkill.servers.master &#8212; Overkill 0.4.4 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -70,7 +70,7 @@
       
       
       
-      <h1 class="site-logo" id="site-title">Overkill 0.4.0 documentation</h1>
+      <h1 class="site-logo" id="site-title">Overkill 0.4.4 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
@@ -247,9 +247,44 @@ title="Fullscreen mode"
 
 
 <div class="viewcode-block" id="Master"><a class="viewcode-back" href="../../../overkill.servers.html#overkill.servers.master.Master">[docs]</a><span class="k">class</span> <span class="nc">Master</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Use this class to start and stop a master server.</span>
+
+<span class="sd">    The main methods of the class include ``start``, ``stop`` and ``get_address``.</span>
+<span class="sd">    The usage of all the listed methods are fairly intuitive except for ``get_address`` which is</span>
+<span class="sd">    mainly used to pass the address tuple to the user or for the worker.</span>
+
+<span class="sd">    :Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; from overkill.servers.master import Master</span>
+<span class="sd">    &gt;&gt;&gt; m = Master()</span>
+<span class="sd">    &gt;&gt;&gt; m.start()</span>
+<span class="sd">    &gt;&gt;&gt; m.get_address()</span>
+<span class="sd">    (&#39;127.0.0.1&#39;, 64406)</span>
+<span class="sd">    &gt;&gt;&gt; m.stop()</span>
+
+<span class="sd">    **Note**: in the above example, the master won&#39;t always try to bind to the port 64406.</span>
+<span class="sd">    The current implementation either lets the kernel decide the port (by default)</span>
+<span class="sd">    or the user can also decide the port (not recommended).</span>
+
+<span class="sd">    Instantiating the class will automatically start logging in &#39;master.log&#39;.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        In the common scenario where you may want to connect to a worker that is on a different</span>
+<span class="sd">        computer, you must use the local ip address of the computer which should look something</span>
+<span class="sd">        like 192.168...</span>
+
+<span class="sd">        The local ip should be passed as a parameter when using the ``start`` method of ``Master``.</span>
+
+<span class="sd">        To find your computers local ip use the command</span>
+<span class="sd">        ``ifconfig`` on mac/unix and ``ipconfig`` on windows.</span>
+
+<span class="sd">    .. warning::</span>
+<span class="sd">        It is not encouraged to have multiple instances of ``Master`` running in the same Python</span>
+<span class="sd">        session, do so at your own risk.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Class acts as a high-level api to start and stop a master server&quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;master.log&quot;</span><span class="p">,</span>
                             <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
                             <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(levelname)s</span><span class="s2"> </span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>overkill.overkill &#8212; Overkill 0.4.0 documentation</title>
+    <title>overkill.overkill &#8212; Overkill 0.4.4 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -70,7 +70,7 @@
       
       
       
-      <h1 class="site-logo" id="site-title">Overkill 0.4.0 documentation</h1>
+      <h1 class="site-logo" id="site-title">Overkill 0.4.4 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -252,12 +252,23 @@ title="Fullscreen mode"
     <span class="sd">&quot;&quot;&quot;The ClusterCompute class acts as the main interface between the Master server and the user.</span>
 <span class="sd">    use this class to distribute an array over a cluster of computers given a function.</span>
 
-<span class="sd">    :param n_workers: number of workers to use to distribute </span>
+<span class="sd">    :param n_workers: number of workers to use to distribute</span>
 <span class="sd">        (array is distributed evenly accross workers)</span>
+<span class="sd">        **Not currently implemented**</span>
 <span class="sd">    :type n_workers: int</span>
 <span class="sd">    :param master_address: A tuple of (ip, port) e.g. (&quot;localhost&quot;, 5555).</span>
 <span class="sd">        Use the .get_address() class member of the Master class to get the address</span>
 <span class="sd">    :type master_address: Tuple[str, int]</span>
+
+<span class="sd">    :Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; from overkill.overkill import ClusterCompute</span>
+<span class="sd">    &gt;&gt;&gt; cc = ClusterCompute(1, (&#39;127.0.0.1&#39;, 63811))</span>
+<span class="sd">    &gt;&gt;&gt; def f(x):</span>
+<span class="sd">    ...     return x**2</span>
+<span class="sd">    &gt;&gt;&gt; cc.map(f, [1, 2, 3])</span>
+<span class="sd">    [1, 4, 9]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">master_address</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -269,7 +280,8 @@ title="Fullscreen mode"
 
 <span class="sd">        :param function: Any array with a single argument</span>
 <span class="sd">        :type function: Callable</span>
-<span class="sd">        :param array: array to distribute e.g. if Array type is List[int] then function should accept an int</span>
+<span class="sd">        :param array: array to distribute </span>
+<span class="sd">            e.g. if Array type is List[int] then function should accept an int</span>
 <span class="sd">        :type array: List</span>
 <span class="sd">        :return: Transformed list if no exception has been raised</span>
 <span class="sd">        :rtype: Union[None, List]</span>

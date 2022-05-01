@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>overkill package &#8212; Overkill 0.4.0 documentation</title>
+    <title>overkill package &#8212; Overkill 0.4.4 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -73,7 +73,7 @@
       
       
       
-      <h1 class="site-logo" id="site-title">Overkill 0.4.0 documentation</h1>
+      <h1 class="site-logo" id="site-title">Overkill 0.4.4 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -393,13 +393,24 @@ use this class to distribute an array over a cluster of computers given a functi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_workers</strong> (<em>int</em>) – number of workers to use to distribute 
-(array is distributed evenly accross workers)</p></li>
+<li><p><strong>n_workers</strong> (<em>int</em>) – number of workers to use to distribute
+(array is distributed evenly accross workers)
+<strong>Not currently implemented</strong></p></li>
 <li><p><strong>master_address</strong> (<em>Tuple</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) – A tuple of (ip, port) e.g. (“localhost”, 5555).
 Use the .get_address() class member of the Master class to get the address</p></li>
 </ul>
 </dd>
+<dt class="field-even">Example</dt>
+<dd class="field-even"><p></p></dd>
 </dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">overkill.overkill</span> <span class="kn">import</span> <span class="n">ClusterCompute</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cc</span> <span class="o">=</span> <span class="n">ClusterCompute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">63811</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cc</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">[1, 4, 9]</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="overkill.overkill.ClusterCompute.map">
 <span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/overkill/overkill.html#ClusterCompute.map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#overkill.overkill.ClusterCompute.map" title="Permalink to this definition">#</a></dt>
@@ -408,7 +419,8 @@ Use the .get_address() class member of the Master class to get the address</p></
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>function</strong> (<em>Callable</em>) – Any array with a single argument</p></li>
-<li><p><strong>array</strong> (<em>List</em>) – array to distribute e.g. if Array type is List[int] then function should accept an int</p></li>
+<li><p><strong>array</strong> (<em>List</em>) – array to distribute 
+e.g. if Array type is List[int] then function should accept an int</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
