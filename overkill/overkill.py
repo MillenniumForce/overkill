@@ -18,12 +18,23 @@ class ClusterCompute:
     """The ClusterCompute class acts as the main interface between the Master server and the user.
     use this class to distribute an array over a cluster of computers given a function.
 
-    :param n_workers: number of workers to use to distribute 
+    :param n_workers: number of workers to use to distribute
         (array is distributed evenly accross workers)
+        **Not currently implemented**
     :type n_workers: int
     :param master_address: A tuple of (ip, port) e.g. ("localhost", 5555).
         Use the .get_address() class member of the Master class to get the address
     :type master_address: Tuple[str, int]
+
+    :Example:
+
+    >>> from overkill.overkill import ClusterCompute
+    >>> cc = ClusterCompute(1, ('127.0.0.1', 63811))
+    >>> def f(x):
+    ...     return x**2
+    >>> cc.map(f, [1, 2, 3])
+    [1, 4, 9]
+
     """
 
     def __init__(self, n_workers: int, master_address: Tuple[str, int]) -> None:
@@ -35,7 +46,8 @@ class ClusterCompute:
 
         :param function: Any array with a single argument
         :type function: Callable
-        :param array: array to distribute e.g. if Array type is List[int] then function should accept an int
+        :param array: array to distribute 
+            e.g. if Array type is List[int] then function should accept an int
         :type array: List
         :return: Transformed list if no exception has been raised
         :rtype: Union[None, List]

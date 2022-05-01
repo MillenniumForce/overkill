@@ -13,9 +13,44 @@ __all__ = ["Master"]
 
 
 class Master:
+    """Use this class to start and stop a master server.
+
+    The main methods of the class include ``start``, ``stop`` and ``get_address``.
+    The usage of all the listed methods are fairly intuitive except for ``get_address`` which is
+    mainly used to pass the address tuple to the user or for the worker.
+
+    :Example:
+
+    >>> from overkill.servers.master import Master
+    >>> m = Master()
+    >>> m.start()
+    >>> m.get_address()
+    ('127.0.0.1', 64406)
+    >>> m.stop()
+
+    **Note**: in the above example, the master won't always try to bind to the port 64406.
+    The current implementation either lets the kernel decide the port (by default)
+    or the user can also decide the port (not recommended).
+
+    Instantiating the class will automatically start logging in 'master.log'.
+
+    .. note::
+        In the common scenario where you may want to connect to a worker that is on a different
+        computer, you must use the local ip address of the computer which should look something
+        like 192.168...
+
+        The local ip should be passed as a parameter when using the ``start`` method of ``Master``.
+
+        To find your computers local ip use the command
+        ``ifconfig`` on mac/unix and ``ipconfig`` on windows.
+
+    .. warning::
+        It is not encouraged to have multiple instances of ``Master`` running in the same Python
+        session, do so at your own risk.
+
+    """
 
     def __init__(self) -> None:
-        """Class acts as a high-level api to start and stop a master server"""
         logging.basicConfig(filename="master.log",
                             filemode="w",
                             format="%(levelname)s %(asctime)s - %(message)s",
