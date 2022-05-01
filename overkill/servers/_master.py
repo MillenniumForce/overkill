@@ -8,7 +8,8 @@ from math import ceil
 from random import random
 from typing import Dict, Tuple
 
-from overkill.servers._server_data_classes import WorkerInfo, WorkOrder, WorkError
+from overkill.servers._server_data_classes import (WorkerInfo, WorkError,
+                                                   WorkOrder)
 from overkill.servers._server_exceptions import AskTypeNotFoundError
 from overkill.servers._server_messaging_standards import (ACCEPT, ACCEPT_WORK,
                                                           CLOSE_CONNECTION,
@@ -25,7 +26,8 @@ from overkill.servers._utils import (decode_message, encode_dict, flatten,
 
 __all__ = [
     "ThreadedMasterServer",
-    "MasterServer"
+    "MasterServer",
+    "reset_globals"
 ]
 
 
@@ -33,6 +35,16 @@ _resources = 0  # server resources (must be >0)
 _workers = {}  # dict of worker_id: WorkerInfo
 _work_orders = {}  # dict of work_id: workOrder
 _lock = threading.Lock()
+
+
+def reset_globals():
+    """Reset global variables:
+    _resources, _workers, _work_orders
+    """
+    global _resources, _workers, _work_orders
+    _resources = 0
+    _workers = {}
+    _work_orders = {}
 
 
 class ThreadedMasterServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -218,13 +230,3 @@ def _handle_work_error(ask: Dict) -> None:
     global _work_orders
     _work_orders[ask["work_id"]].error = ask["error"]
     _work_orders[ask["work_id"]].event.set()
-
-
-def reset_globals():
-    """Reset global variables:
-    _resources, _workers, _work_orders
-    """
-    global _resources, _workers, _work_orders
-    _resources = 0
-    _workers = {}
-    _work_orders = {}
