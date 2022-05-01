@@ -59,6 +59,9 @@ class WorkerServer(socketserver.BaseRequestHandler):
                 send_message(encode_dict(
                     {"type": ACCEPT_WORK, "work_id": ask["work_id"], "data": results, "order": ask["order"]}), _master.address)
 
+            elif ask["type"] == MASTER_SHUTDOWN:
+                _master = None
+
             else:
                 raise AskTypeNotFoundError(f"No such type {ask['type']}")
 
@@ -110,8 +113,8 @@ def reset_globals() -> None:
 
 def close_connection_with_master() -> None:
     """Close connection with master"""
-    if _master:
+    try:
         msg = encode_dict({"type": CLOSE_CONNECTION, "id": _id})
         send_message(msg, _master.address)
-    else:
-        logging.info("No master started, skipping closing message")
+    except Exception as e:
+        logging.info(f"Could not close connection with master, reason: {e}")

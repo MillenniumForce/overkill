@@ -13,8 +13,7 @@ REJECT = "reject"  # reject a worker that is trying to connect to master
 ACCEPT = "accept"  # accept a worker that is trying to connect to master
 DELEGATE_WORK = "delegate_work"  # delegate work to a worker
 FINISHED_TASK = "finished_task"  # task from user has been completely finished
-# error when there are no workers when the user asks for work
-NO_WORKERS_ERROR = "no_workers_error"
+NO_WORKERS_ERROR = "no_workers_error" # error when there are no workers when the user asks for work
 
 # Worker messsaging standards:
 CLOSE_CONNECTION = "close"  # close connection with master
