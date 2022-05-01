@@ -14,7 +14,36 @@ from ._worker import (ThreadedWorkerServer, WorkerServer,
 
 
 class Worker:
+    """Use this class to start and stop a worker server.
 
+    The main methods of the class include ``start``, ``stop``, ``get_address`
+    and ``connect_to_master``.
+
+    :Example:
+
+    >>> from overkill.servers.worker import Worker
+    >>> w = Worker('test')
+    >>> w.start()
+    >>> w.connect_to_master('127.0.0.1', 64406) # ip and port from get_address() method of master
+    >>> w.stop()
+
+    Instantiating the class will automatically start logging in 'worker.log'.
+
+    .. note::
+        In the common scenario where you may want to connect to the master that is on a different
+        computer, you must use the local ip address of the computer which should look something
+        like 192.168...
+
+        The local ip should be passed as a parameter when using the ``start`` method of ``Worker``.
+
+        To find your computers local ip use the command
+        ``ifconfig`` on mac/unix and ``ipconfig`` on windows.
+
+    .. warning::
+        It is not encouraged to have multiple instances of ``Worker`` running in the same Python
+        session, do so at your own risk.
+    
+    """
     def __init__(self, name: str) -> None:
         """Class acts as a high-level api to start and stop a worker server
 
