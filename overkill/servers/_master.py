@@ -8,7 +8,8 @@ from math import ceil
 from random import random
 from typing import Dict, Tuple
 
-from overkill.servers._server_data_classes import WorkerInfo, WorkOrder
+from overkill.servers._server_data_classes import (WorkerInfo, WorkError,
+                                                   WorkOrder)
 from overkill.servers._server_exceptions import AskTypeNotFoundError
 from overkill.servers._server_messaging_standards import (ACCEPT, ACCEPT_WORK,
                                                           CLOSE_CONNECTION,
@@ -25,7 +26,8 @@ from overkill.servers._utils import (decode_message, encode_dict, flatten,
 
 __all__ = [
     "ThreadedMasterServer",
-    "MasterServer"
+    "MasterServer",
+    "reset_globals"
 ]
 
 
@@ -33,6 +35,16 @@ _resources = 0  # server resources (must be >0)
 _workers = {}  # dict of worker_id: WorkerInfo
 _work_orders = {}  # dict of work_id: workOrder
 _lock = threading.Lock()
+
+
+def reset_globals():
+    """Reset global variables:
+    _resources, _workers, _work_orders
+    """
+    global _resources, _workers, _work_orders
+    _resources = 0
+    _workers = {}
+    _work_orders = {}
 
 
 class ThreadedMasterServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -64,12 +76,13 @@ class MasterServer(socketserver.BaseRequestHandler):
                     err = {"type": NO_WORKERS_ERROR}
                     socket_send_message(encode_dict(err), self.request)
                     return
-                work_id = _delegate_task(ask)
+                try:
+                    work_id = _delegate_task(ask)
+                except WorkError as e:
+                    self.send_work_error(e)
                 _work_orders[work_id].event.wait()
                 if _work_orders[work_id].error:
-                    err = {"type": WORK_ERROR,
-                           "error": _work_orders[work_id].error}
-                    socket_send_message(encode_dict(err), self.request)
+                    self.send_work_error(_work_orders[work_id].error)
                     return
                 data = flatten(_work_orders[work_id].data)
                 work_order = _work_orders.pop(work_id)
@@ -97,6 +110,16 @@ class MasterServer(socketserver.BaseRequestHandler):
             logging.info(f"Could not handle request: {e}")
             logging.info(traceback.format_exc())
             return
+
+    def send_work_error(self, error: WorkError):
+        """Send an error message to the user
+
+        :param error: error message
+        :type error: WorkError
+        """
+        err = {"type": WORK_ERROR,
+               "error": error}
+        socket_send_message(encode_dict(err), self.request)
 
 
 @synchronized(_lock)
@@ -141,12 +164,15 @@ def _delegate_task(ask: Dict) -> int:
     func = ask["function"]
     array = ask["array"]
 
-    logging.info("Array len: %d, num resources: %d",
-                 len(array), _resources)
-    size = ceil(len(array) / _resources)
-    array_split = [array[i: i+size] for i in range(0, len(array), size)]
-    work_id = hash(random())
-    event = threading.Event()
+    try:
+        logging.info("Array len: %d, num resources: %d",
+                     len(array), _resources)
+        size = ceil(len(array) / _resources)
+        array_split = [array[i: i+size] for i in range(0, len(array), size)]
+        work_id = hash(random())
+        event = threading.Event()
+    except Exception as e:
+        raise WorkError(e)
 
     for worker, (i, data) in zip(_workers.values(), enumerate(array_split)):
         # assume worker will always accept work
@@ -204,13 +230,3 @@ def _handle_work_error(ask: Dict) -> None:
     global _work_orders
     _work_orders[ask["work_id"]].error = ask["error"]
     _work_orders[ask["work_id"]].event.set()
-
-
-def reset_globals():
-    """Reset global variables:
-    _resources, _workers, _work_orders
-    """
-    global _resources, _workers, _work_orders
-    _resources = 0
-    _workers = {}
-    _work_orders = {}

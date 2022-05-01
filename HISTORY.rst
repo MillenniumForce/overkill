@@ -53,3 +53,23 @@ Notes: could be optimised further but experimentation is required
 
 * Abstracted master and worker classes into _master and _worker files respectively
 * Refactored util modules into protected modules
+
+0.4.1 (2022-04-25)
+------------------
+
+* Errors where the user might mispecify the function or array are caught by the Master server and raised with the user
+
+0.4.2 (2022-04-25)
+------------------
+
+* Removed array from WorkOrder repr so logs aren't flooded. There is still a temporary issue that the entire array is printed when an ask is initially sent to master but will be amended in a future release. See issue #37
+
+0.4.3 (2022-05-01)
+------------------
+
+* If the worker cannot notify the master that it is shutting down, log the error instead of spitting out an ugly traceback to the user
+
+0.4.4 (2022-05-01)
+------------------
+
+* Updated docs for Master, ClusterCompute and Worker classes

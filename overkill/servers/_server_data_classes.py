@@ -27,7 +27,7 @@ class WorkOrder:
     """Class documents information about a work order from a client"""
     num_workers: int
     event: Event
-    data: List = field(default_factory=lambda: [])
+    data: List = field(default_factory=lambda: [], repr=False)
     progress: float = 0
     error: Union[None, WorkError] = None
 

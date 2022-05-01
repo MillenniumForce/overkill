@@ -110,8 +110,8 @@ def reset_globals() -> None:
 
 def close_connection_with_master() -> None:
     """Close connection with master"""
-    if _master:
+    try:
         msg = encode_dict({"type": CLOSE_CONNECTION, "id": _id})
         send_message(msg, _master.address)
-    else:
-        logging.info("No master started, skipping closing message")
+    except Exception as e:
+        logging.info(f"Could not close connection with master, reason: {e}")
