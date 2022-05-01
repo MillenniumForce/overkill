@@ -68,3 +68,8 @@ Notes: could be optimised further but experimentation is required
 ------------------
 
 * If the worker cannot notify the master that it is shutting down, log the error instead of spitting out an ugly traceback to the user
+
+0.4.4 (2022-05-01)
+------------------
+
+* Updated docs for Master, ClusterCompute and Worker classes
